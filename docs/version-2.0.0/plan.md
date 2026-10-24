@@ -27,7 +27,7 @@ PC/desktop browsers only. Mobile and tablet support, mobile layouts and breakpoi
 - The requested **timer is a duration countdown with an alarm**: set one hour, start, and receive an alert at the end. It is not a countdown to a calendar event.
 - A **focus/Pomodoro timer** adds work/break sessions and repeated cycles. It is a possible future enhancement; it is not necessary to deliver the requested timer.
 - Plan optional desktop notifications for completion while dashboard tabs are closed. Audible alerts in an open dashboard are core behavior. Sound with every dashboard closed requires a separately validated offscreen approach and must not be promised by default.
-- Local-first storage and offline operation remain the default for core widgets. Existing weather/media/browser integrations retain their current boundaries.
+- Local-first storage and offline operation remain the default for core widgets. Widgets that use remote content must provide a documented local fallback. Existing weather/media/browser integrations retain their current boundaries.
 
 ## Intended experience
 
@@ -47,9 +47,9 @@ Work includes engine evaluation, registry/lifecycle, versioned storage and migra
 
 ### Phase 2 — Offline widgets
 
-**Outcome:** Users can add useful personal widgets without accounts or external data services.
+**Outcome:** Users can add useful personal widgets without accounts, with local fallbacks for any widget that optionally uses a remote data service.
 
-Deliver duration timer, background notification integration, spacer, notes, quotes, and local image viewer. Multiple instances must remain independent. Timer completion must be coordinated across open tabs. Background scheduling is browser-dependent and is not an exact real-time alarm service; document behavior for sleep, restart, denied notifications, and a closed browser.
+Deliver duration timer, background notification integration, spacer, notes, an API-backed quote widget with a bundled offline fallback, and a local image viewer. Multiple instances must remain independent. Timer completion must be coordinated across open tabs. Background scheduling is browser-dependent and is not an exact real-time alarm service; document behavior for sleep, restart, denied notifications, and a closed browser. Quote API usage, attribution, caching, failure behavior, and fallback selection must be documented.
 
 ### Phase 3 — Customization polish
 
@@ -171,7 +171,7 @@ Current totals: **12/24 core stories Done**, **5 roadmap stories**. Phase 1: **1
 | [ ] | [TT2-011: Support timer completion when the dashboard is closed](tasks/TT2-011-timer-background-alerts.md) | Offline widgets | P0 | Todo |
 | [ ] | [TT2-012: Add an invisible spacer widget](tasks/TT2-012-spacer-widget.md) | Offline widgets | P1 | Todo |
 | [ ] | [TT2-013: Add an autosaving notes widget](tasks/TT2-013-notes-widget.md) | Offline widgets | P1 | Todo |
-| [ ] | [TT2-014: Add a quote widget that works offline](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | Todo |
+| [ ] | [TT2-014: Add an API-backed quote widget with an offline fallback](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | Todo |
 | [ ] | [TT2-015: Add a local image viewer widget](tasks/TT2-015-image-viewer-widget.md) | Offline widgets | P1 | Todo |
 | [ ] | [TT2-016: Offer starter layouts and a recoverable reset](tasks/TT2-016-layout-presets-and-reset.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-017: Export and import validated canvas configurations](tasks/TT2-017-layout-export-and-import.md) | Customization polish | P1 | Todo |
@@ -217,3 +217,4 @@ Release only after core acceptance criteria are complete or an explicit scope ch
 | 2026-10-24 | Implemented schema-v2 local workspace persistence and recoverable v1 migration; converted production widgets; added glass gallery, bounded layout history, tab-scoped draft recovery, grid pointer/keyboard editing, locks, and desktop window adaptation. TT2-003 is done; TT2-004–009 remain in progress pending review. | The last full unit/browser run predates these latest interaction changes. No tests were added or run in this turn. Inspect each story's verification record before completion. |
 | 2026-10-24 | Completed TT2-004–009 and the Phase 1 Canvas Foundation. Added the tested browser verification evidence to each story and adjusted the shared glass fill after maximum-opacity review showed weak text contrast over a bright wallpaper. | Temporary headless Brave checks passed preview editing/history/resize/cancel/save/reload/draft recovery, installed bookmark and tab-mute integration, desktop geometry invariance, and opacity/wallpaper review screenshots. Node/npm are unavailable here, so the repository unit/browser commands and assistive-technology review remain outstanding for release verification. |
 | 2026-10-24 | Added and completed TT2-027–029 from the customization feedback: one Customize entry point, a smaller General panel with per-widget preferences, a per-layout desktop fill option, and an optional configurable top-bar widget. Phase 1 now tracks 12 stories. | Temporary Brave checks passed the new edit entry, General fields, widget settings/rollback, named layout save/switch, top-bar migration and customization, fill preference persistence, and existing canvas interactions. |
+| 2026-10-24 | Clarified TT2-014 as an API-backed quote widget with local caching, personal quotes stored locally, and a bundled offline fallback. Phase 2 remains offline-first for its other widgets while documenting remote-content fallback requirements. | Documentation review only; implementation and API selection remain pending. |

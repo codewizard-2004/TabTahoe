@@ -1,4 +1,4 @@
-# TT2-014: Add a quote widget that works offline
+# TT2-014: Add an API-backed quote widget with an offline fallback
 
 - **Type:** Story
 - **Phase:** Offline widgets
@@ -14,20 +14,22 @@ As a user, I want a daily or manually shuffled quote so that my dashboard can sh
 
 ## Scope and implementation notes
 
-- Bundle a modest collection with recorded license/provenance and attribution.
-- Support daily selection, manual shuffle, and an optional personal quote collection.
-- Make local-date rollover deterministic and keep the current selection stable across tabs.
+- Use a documented quote API when available, with a modest bundled collection as the deterministic offline fallback. Record source licensing, provenance, attribution, and the API's data-use requirements.
+- Support daily selection, manual shuffle, and an optional personal quote collection. Keep personal quotes local and do not send them to the API.
+- Cache the last successful API result locally, define behavior for API errors, rate limits, malformed responses, and unavailable network access, and fall back to bundled quotes when needed.
+- Make local-date rollover deterministic and keep the current selection stable across tabs, including when switching between API and fallback sources.
 
 ## Acceptance criteria
 
-- [ ] Bundled quotes render without network access and display available attribution.
+- [ ] API quotes render when the service is available and display the required attribution.
+- [ ] Bundled fallback quotes render without network access and display available attribution.
 - [ ] Daily selection is stable for the chosen local day and changes at the documented rollover.
 - [ ] Personal quotes are stored locally and inserted as text.
 - [ ] Long quotes adapt or scroll within supported widget sizes without obscuring controls.
 
 ## Verification
 
-Verify date boundaries, reload consistency, an empty personal collection, long text, and offline behavior.
+Verify API success, attribution, caching, rate-limit and malformed-response handling, fallback behavior without network access, date boundaries, reload consistency, an empty personal collection, long text, and offline behavior.
 
 ## Progress checklist
 

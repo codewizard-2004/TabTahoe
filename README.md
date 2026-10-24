@@ -4,7 +4,7 @@ A macOS-inspired new tab extension for Brave and Chromium based browsers. Froste
 
 TabTahoe supports PC/desktop browsers only. Mobile and tablet support, layouts, and touch-specific optimization are outside the project scope.
 
-**Version 1.0.0** · Manifest V3 · No build step, dependencies, accounts, or API keys required.
+**Version 2.0.0** · Manifest V3 · No build step, dependencies, accounts, or API keys required.
 
 ## Install
 
@@ -17,7 +17,7 @@ After changing the source, click **Reload** on the extension card and open a new
 
 A GitHub release distributes the files for manual installation. It does not publish the extension to the Chrome Web Store.
 
-## Version 1 features
+## Dashboard features
 
 ### Favourites
 
@@ -120,17 +120,34 @@ Network requests are limited to the features you use:
 
 Calendar tasks introduce no additional permission or network service.
 
-## Version 2.0.0 canvas foundation (in development)
+## Version 2.0.0 canvas foundation
 
-The 2.0.0 work converts the dashboard into locally saved widget layouts. Each
-named layout can keep its own arrangement, widget settings, and appearance, so
-you can save alternatives such as “Amal’s layout” and “Sandra’s style.” Layouts
-are stored in the current browser profile; they are not cloud-synced. Existing
-calendar tasks and browser bookmarks remain shared if a widget or layout is
-removed. Version 1 settings and shortcut groups are migrated with a recoverable
-backup. See the [2.0.0 plan](docs/version-2.0.0/plan.md) and [storage and named
-layout notes](docs/version-2.0.0/storage-and-named-layouts.md) for current
-implementation status and limitations.
+The 2.0.0 canvas foundation is complete. The dashboard now runs as a
+desktop-first, locally saved canvas with independently configured widget
+instances. The completed foundation includes:
+
+- A packaged GridStack-based layout adapter with snapped placement, intentional
+	empty space, collision handling, resizing, and preserved geometry across
+	desktop window sizes and browser zoom.
+- A widget registry and lifecycle boundary for the existing clock, weather,
+	sound control, calendar, bookmarks, favourites, greeting, and optional top
+	bar widgets.
+- Versioned workspace storage, recoverable version 1 migration, named layouts,
+	per-layout appearance settings, and tab-scoped draft recovery.
+- Transactional customization with a widget gallery, move/resize/lock controls,
+	bounded undo/redo history, save/cancel behavior, and keyboard movement and
+	resizing without dragging.
+- A shared glass widget shell and gallery that keeps app-owned dialogs,
+	controls, and transient feedback consistent with the wallpaper-visible theme.
+
+Each named layout can keep its own arrangement, widget settings, and appearance,
+so you can save alternatives such as “Amal’s layout” and “Sandra’s style.”
+Layouts are stored in the current browser profile; they are not cloud-synced.
+Existing calendar tasks and browser bookmarks remain shared if a widget or
+layout is removed. Version 1 settings and shortcut groups are migrated with a
+recoverable backup. See the [2.0.0 plan](docs/version-2.0.0/plan.md) and
+[storage and named layout notes](docs/version-2.0.0/storage-and-named-layouts.md)
+for implementation status and limitations.
 
 The canvas editor includes a widget gallery, move/resize/lock controls, and a
 bounded undo/redo history. Unsaved edits are kept in the current tab session
@@ -143,6 +160,22 @@ layouts, load one, edit it, rename it, or delete it. Loading a preview while
 editing, or deleting the active layout while editing, tells you that unsaved
 edits will be discarded. Version 2.0.0 still needs complete release and
 assistive-technology review.
+
+### Current screenshots
+
+These screenshots show the completed canvas foundation in the desktop browser:
+
+![TabTahoe 2.0.0 dashboard](docs/version-2.0.0/screenshots/home.png)
+
+*The normal dashboard with independently arranged glass widgets.*
+
+![TabTahoe 2.0.0 canvas editor](docs/version-2.0.0/screenshots/edit.png)
+
+*Canvas customization with widget movement, resizing, locking, and history controls.*
+
+![TabTahoe 2.0.0 saved layouts](docs/version-2.0.0/screenshots/layout.png)
+
+*The saved-layout picker with visual previews, rename, edit, and delete actions.*
 
 ## Development
 
