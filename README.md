@@ -1,6 +1,8 @@
 # TabTahoe
 
-A macOS-inspired new tab extension for Brave and Chromium. Frosted glass, nature wallpapers, and everyday essentials in one quiet dashboard.
+A macOS-inspired new tab extension for Brave and Chromium based browsers. Frosted glass, nature wallpapers, and everyday essentials in one quiet dashboard.
+
+TabTahoe supports PC/desktop browsers only. Mobile and tablet support, layouts, and touch-specific optimization are outside the project scope.
 
 **Version 1.0.0** · Manifest V3 · No build step, dependencies, accounts, or API keys required.
 
@@ -52,7 +54,7 @@ Some custom players, Web Audio, inaccessible cross-origin embeds, and protected 
 
 ### Backgrounds and appearance
 
-Open **Customize** to change your name, search engine, clock format, glass opacity, and visible widgets.
+In version 2.0.0, **Customize** at the bottom of the page opens canvas edit mode. Choose **General settings** there to change wallpapers, rotation, glass opacity, and whether the canvas fills the desktop window. Search engine, temperature, greeting name, clock format, and shortcut appearance are set on their individual widgets.
 
 **Shortcut appearance** offers four choices:
 
@@ -63,7 +65,7 @@ Open **Customize** to change your name, search engine, clock format, glass opaci
 | Clear glass boxes · no colour | Nearly transparent, untinted boxes with subtle borders and lighter blur |
 | Icons only | Website icons with their names underneath |
 
-Styles also apply to shortcuts inside groups. Folder containers remain visible. Both glass styles follow the glass opacity preference.
+Set shortcut appearance separately on each Favourites widget. Styles also apply to shortcuts inside groups; folder containers remain visible. Both glass styles follow the shared glass opacity preference.
 
 For backgrounds:
 
@@ -78,7 +80,7 @@ Timed wallpaper rotation resumes when the dashboard is reopened. No background p
 
 Enter a web address or search query. **Ctrl+K / Cmd+K** focuses search when the page has keyboard focus; a fresh new tab initially focuses the browser address bar.
 
-The desktop layout uses the viewport height, with Favourites aligned to the widget column. Shortcuts paginate as space changes. On narrow or very short screens, content scrolls inside the dashboard to keep controls accessible.
+The desktop layout uses the viewport height, with Favourites aligned to the widget column. Shortcuts paginate as space changes. In smaller or short desktop windows, content scrolls inside the dashboard to keep controls accessible.
 
 ## Glass theme
 
@@ -117,6 +119,30 @@ Network requests are limited to the features you use:
 | Optional HTTP/HTTPS site access | Enable playback controls for a selected website when requested |
 
 Calendar tasks introduce no additional permission or network service.
+
+## Version 2.0.0 canvas foundation (in development)
+
+The 2.0.0 work converts the dashboard into locally saved widget layouts. Each
+named layout can keep its own arrangement, widget settings, and appearance, so
+you can save alternatives such as “Amal’s layout” and “Sandra’s style.” Layouts
+are stored in the current browser profile; they are not cloud-synced. Existing
+calendar tasks and browser bookmarks remain shared if a widget or layout is
+removed. Version 1 settings and shortcut groups are migrated with a recoverable
+backup. See the [2.0.0 plan](docs/version-2.0.0/plan.md) and [storage and named
+layout notes](docs/version-2.0.0/storage-and-named-layouts.md) for current
+implementation status and limitations.
+
+The canvas editor includes a widget gallery, move/resize/lock controls, and a
+bounded undo/redo history. Unsaved edits are kept in the current tab session
+and can be resumed after a reload. Use arrow keys on a widget's move handle to
+move it, or focus its resize control and use arrow keys to resize it. The top
+bar is a widget too: edit its title, tagline, and date visibility, or remove it.
+The bottom Customize action remains available when the canvas is empty. Use the
+separate **Change layout** button beside it to browse visual previews of saved
+layouts, load one, edit it, rename it, or delete it. Loading a preview while
+editing, or deleting the active layout while editing, tells you that unsaved
+edits will be discarded. Version 2.0.0 still needs complete release and
+assistive-technology review.
 
 ## Development
 

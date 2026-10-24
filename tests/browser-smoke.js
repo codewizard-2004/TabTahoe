@@ -5,12 +5,13 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { resolve, extname } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
+import { checkDashboard } from './dashboard-browser.js';
 
 const root = resolve(import.meta.dirname, '..');
 const profile = await mkdtemp(resolve(tmpdir(), 'tabtahoe-test-'));
 const results = resolve(root, 'test-results');
 await mkdir(results, { recursive: true });
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.wav': 'audio/wav' };
 const server = createServer(async (request, response) => {
   try {
     const path = resolve(root, `.${decodeURIComponent(new URL(request.url, 'http://localhost').pathname === '/' ? '/index.html' : new URL(request.url, 'http://localhost').pathname)}`);
@@ -80,80 +81,17 @@ try {
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1080, deviceScaleFactor: 1, mobile: false });
   await send('Fetch.enable', { patterns: [{ urlPattern: '*api.open-meteo.com/*' }, { urlPattern: '*geocoding-api.open-meteo.com/*' }] });
-  await send('Page.navigate', { url: `http://127.0.0.1:${server.address().port}` });
-  await waitFor('document.querySelectorAll("#app-grid > .app-item").length === 12');
-  assert.equal(await evaluate('document.querySelectorAll("#calendar > span").length'), 49);
-  assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-  await screenshot('desktop.png');
-  console.log('PASS: dashboard renders, calendar dates, no desktop overflow');
-
-  await click('#shortcut-add'); await fill('#shortcut-form [name=title]', '<script>Test</script>');
-  await fill('#shortcut-form [name=url]', 'javascript:alert(1)'); await submit('#shortcut-form');
-  assert.equal(await evaluate('document.querySelector("#shortcut-dialog").open'), true);
-  await fill('#shortcut-form [name=url]', 'https://example.com'); await submit('#shortcut-form');
-  assert.equal(await evaluate('document.querySelectorAll("#app-grid > .app-item").length'), 13);
-  assert.equal(await evaluate('document.querySelector("#app-grid").textContent.includes("<script>Test</script>")'), true);
-  await click('#edit-layout');
-  await evaluate('document.querySelectorAll("#app-grid > .app-item")[2].querySelector("a").click()');
-  await fill('#shortcut-form [name=title]', 'YouTube Music'); await submit('#shortcut-form');
-  assert.equal(await evaluate('document.querySelectorAll("#app-grid > .app-item")[2].textContent.includes("YouTube Music")'), true);
-  await click('#edit-layout');
-  await click('#group-add'); await fill('#new-group-name', 'Reading'); await submit('#name-form');
-  await evaluate('[...document.querySelectorAll("#app-grid > .app-item")].find(x => x.textContent.includes("Reading")).querySelector("button").click()');
-  await click('#group-shortcut-add'); await fill('#shortcut-form [name=title]', 'Library'); await fill('#shortcut-form [name=url]', 'https://example.org'); await submit('#shortcut-form');
-  assert.equal(await evaluate('document.querySelectorAll("#group-apps .app-tile").length'), 1);
-  await click('#group-dialog .close-dialog');
-  console.log('PASS: URL validation, safe user text, shortcut editing preserves order, custom groups');
-
-  await click('#customize'); await fill('#settings-form [name=name]', 'Amal'); await fill('#settings-form [name=rotation]', '5');
-  await evaluate('document.querySelector("#settings-form [name=hour24]").checked = true');
-  await submit('#settings-form');
-  assert.equal(await evaluate('document.querySelector("#greeting").textContent.includes("AMAL")'), true);
-  await send('Page.reload');
-  await waitFor('document.querySelector("#greeting")?.textContent.includes("AMAL")');
-  assert.equal(await evaluate('document.querySelectorAll("#app-grid > .app-item").length'), 14);
-  await click('#wallpaper-next');
-  assert.equal(await evaluate('document.querySelector("#wallpaper-name").textContent'), 'Into the green');
-  console.log('PASS: settings and app persistence, wallpaper switching');
-
-  await click('#weather-location'); await fill('#city-search', 'Bengaluru'); await submit('#location-form');
-  await waitFor('document.querySelector(".city-result")'); await click('.city-result');
-  await waitFor('document.querySelector("#temperature").textContent === "24°"');
-  assert.equal(await evaluate('document.querySelector("#weather-summary").textContent'), 'Partly cloudy');
-  console.log('PASS: city selection and forecast rendering (mocked weather responses)');
-
-  const wave = Buffer.alloc(44 + 16000 * 2 * 3);
-  wave.write('RIFF'); wave.writeUInt32LE(wave.length - 8, 4); wave.write('WAVEfmt ', 8); wave.writeUInt32LE(16, 16); wave.writeUInt16LE(1, 20); wave.writeUInt16LE(1, 22); wave.writeUInt32LE(16000, 24); wave.writeUInt32LE(32000, 28); wave.writeUInt16LE(2, 32); wave.writeUInt16LE(16, 34); wave.write('data', 36); wave.writeUInt32LE(wave.length - 44, 40);
-  const musicFile = resolve(profile, 'Test track.wav'); await writeFile(musicFile, wave);
-  const documentNode = await send('DOM.getDocument');
-  const inputNode = await send('DOM.querySelector', { nodeId: documentNode.root.nodeId, selector: '#audio-files' });
-  await send('DOM.setFileInputFiles', { nodeId: inputNode.nodeId, files: [musicFile] });
-  await waitFor('document.querySelector("#audio").readyState >= 1');
-  await click('#play'); await waitFor('!document.querySelector("#audio").paused');
-  await click('#play'); assert.equal(await evaluate('document.querySelector("#audio").paused'), true);
-  await click('#repeat'); assert.equal(await evaluate('document.querySelector("#audio").loop'), true);
-  console.log('PASS: local audio loading, actual playback, pause and repeat');
-
-  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
-  assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-  await screenshot('mobile.png');
-  console.log('PASS: narrow layout has no horizontal overflow');
-
+  const previewOrigin = `http://127.0.0.1:${server.address().port}`;
+  await checkDashboard({ send, evaluate, waitFor, click, fill, submit, screenshot, wallpaperFile: resolve(root, 'assets/forest.jpg'), origin: previewOrigin });
   await send('Page.navigate', { url: 'chrome://newtab/' });
-  await waitFor('location.protocol === "chrome-extension:" && document.querySelectorAll("#app-grid > .app-item").length === 12', 'installed extension new tab override');
-  const bookmarkId = await evaluate('(async () => (await chrome.bookmarks.create({ parentId: "1", title: "TabTahoe test", url: "https://example.com/bookmark" })).id)()');
-  await click('#bookmarks-open');
-  await waitFor('document.querySelector("#all-bookmarks").textContent.includes("TabTahoe test")');
-  await evaluate('[...document.querySelectorAll(".bookmark-row")].find(x => x.textContent.includes("TabTahoe test")).querySelector("button").click()');
-  await click('#bookmarks-dialog .close-dialog');
-  await waitFor('document.querySelector("#pinned-bookmarks").textContent.includes("TabTahoe test")');
-  await send('Page.reload');
-  await waitFor('document.querySelector("#pinned-bookmarks")?.textContent.includes("TabTahoe test")');
-  await evaluate(`chrome.bookmarks.remove(${JSON.stringify(bookmarkId)})`);
-  await waitFor('!document.querySelector("#pinned-bookmarks").textContent.includes("TabTahoe test")');
-  console.log('PASS: installed MV3 new tab override, real bookmarks, pin persistence, live removal');
+  await waitFor('location.protocol === \"chrome-extension:\"', 'installed extension origin');
+  const extensionOrigin = await evaluate('location.origin');
+  await checkDashboard({ send, evaluate, waitFor, click, fill, submit, screenshot, wallpaperFile: resolve(root, 'assets/forest.jpg'), origin: extensionOrigin, installed: true, previewOrigin });
   assert.deepEqual(exceptions, [], 'No unhandled browser exceptions');
   console.log(`All browser checks passed. Screenshots: ${results}`);
+} catch (error) {
+  if (exceptions.length) console.error('Browser exceptions:', JSON.stringify(exceptions, null, 2));
+  throw error;
 } finally {
   for (const item of pending.values()) clearTimeout(item.timeout);
   socket?.close();
