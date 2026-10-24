@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "TabTahoe — A little space to breathe",
+  "version": "1.0.0",
+  "description": "A macOS-inspired glass new tab with favourites, bookmarks, calendar, weather, and website sound controls.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "storage",
+    "bookmarks",
+    "tabs",
+    "scripting",
+    "favicon"
+  ],
+  "host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; img-src 'self' data: blob: https: http:; media-src 'self' blob:;"
+  },
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
+}
