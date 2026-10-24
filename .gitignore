@@ -2,3 +2,4 @@ test-results/
 __pycache__/
 .DS_Store
 AGENTS.md
+CHANGELOG.MD

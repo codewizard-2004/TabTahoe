@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data: blob:;">
+  <title>TabTahoe canvas foundation</title>
+  <link rel="icon" href="../../assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../../vendor/gridstack/gridstack.min.css">
+  <link rel="stylesheet" href="canvas.css">
+  <script src="../../vendor/gridstack/gridstack-all.js" defer></script>
+  <script src="canvas.js" type="module"></script>
+</head>
+<body class="canvas-fixture">
+  <div id="wallpaper" aria-hidden="true"></div>
+  <main>
+    <header class="fixture-toolbar glass">
+      <div><p class="eyebrow">CANVAS FOUNDATION · PROTOTYPE</p><h1>A little room to arrange.</h1></div>
+      <nav aria-label="Canvas controls">
+        <button id="edit-canvas" class="subtle-button" aria-pressed="false">Edit canvas</button>
+        <button id="save-canvas" class="primary-button">Save layout</button>
+        <button id="restore-canvas" class="subtle-button">Restore saved</button>
+        <button id="add-clock" class="subtle-button">Add clock</button>
+        <button id="add-failure" class="subtle-button">Add failing widget</button>
+      </nav>
+    </header>
+    <p id="canvas-instructions" class="fixture-help">An isolated prototype; saves use a separate storage key. Edit to drag card handles (press and hold on touch) or resize from the bottom right. On a focused move handle, use arrow keys to move and Shift + arrows to resize. Narrow windows stack cards without changing desktop coordinates.</p>
+    <p id="canvas-status" role="status" aria-live="polite"></p>
+    <div id="canvas" class="grid-stack" role="region" aria-label="Widget canvas" aria-describedby="canvas-instructions"></div>
+  </main>
+</body>
+</html>

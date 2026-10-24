@@ -11,7 +11,7 @@ export const WALLPAPERS = [
 
 export const DEFAULT_SETTINGS = {
   name: '', rotation: '60', wallpaper: 0, wallpaperAt: 0,
-  opacity: 16, unit: 'celsius', engine: 'google', hour24: false, iconsOnly: false, shortcutStyle: null,
+  opacity: 16, fillWindow: false, unit: 'celsius', engine: 'google', hour24: false, iconsOnly: false, shortcutStyle: null,
   widgets: { clock: true, weather: true, music: true, calendar: true, bookmarks: true },
   location: null, backgroundSource: 'bundled', unsplashId: null,
 };
