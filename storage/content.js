@@ -10,6 +10,7 @@ export function createContentStore(backend, notifyError) {
   let tasks = {}, pinned = [], preferences = {};
   const emit = (kind, key) => { for (const listener of listeners) listener(kind, key); };
   const extension = globalThis.chrome?.storage?.local;
+  const widgetListeners = new Set();
   const store = {
     async load(canvas) {
       const ids = [...new Set(canvas.widgets.filter(item => item.type === 'favourites').map(item => item.settings.collectionId))];
@@ -66,10 +67,21 @@ export function createContentStore(backend, notifyError) {
       pinned = [...ids]; emit('bookmarks');
     },
     getPreferences() { return preferences; },
+    async getWidgetContent(id) { return backend.get(`widgetContent:${id}`); },
+    async saveWidgetContent(id, value) {
+      if (JSON.stringify(value).length > 200000) throw new Error('This content is too large to save.');
+      await backend.set({ [`widgetContent:${id}`]: value });
+      for (const listener of widgetListeners) listener(id, value);
+    },
+    subscribeWidgetContent(listener) { widgetListeners.add(listener); return () => widgetListeners.delete(listener); },
     setPreferences(value) { preferences = value; },
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
   };
   backend.subscribe((key, value) => {
+    if (key.startsWith('widgetContent:')) {
+      const id = key.slice('widgetContent:'.length);
+      for (const listener of widgetListeners) listener(id, value);
+    }
     if (key.startsWith(COLLECTION_PREFIX)) {
       const id = key.slice(COLLECTION_PREFIX.length);
       try { collections.set(id, validateCollection(value)); errors.delete(id); }

@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P0
-- **Status:** Todo
+- **Status:** In progress — implementation added; installed-extension verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-010](TT2-010-duration-countdown-timer.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -37,7 +37,7 @@ Verify in an installed extension with multiple new tabs, all dashboard tabs clos
 ## Progress checklist
 
 - [ ] Confirm implementation details and resolve story-specific open questions.
-- [ ] Implement the agreed scope.
+- [x] Implement the agreed scope.
 - [ ] Complete acceptance criteria and appropriate verification.
 - [ ] Record evidence, limitations, and relevant documentation changes.
 - [ ] Update this story and the central plan to Done.
@@ -47,6 +47,9 @@ Verify in an installed extension with multiple new tabs, all dashboard tabs clos
 | Date | Update | Evidence / blocker |
 | --- | --- | --- |
 | 2026-10-24 | Story created; implementation has not started. | Planning only. |
+| 2026-10-25 | Added MV3 service worker deadline alarms, startup reconciliation, completion state persistence, and opt-in desktop notifications. Added alarms and optional notifications permissions and documented sleep/shutdown limitations. | Browser API implementation added; verify installed extension with permissions, closed tabs, restart, and sleep. |
+| 2026-10-25 | Moved desktop notification opt-in into timer settings and added an optional progress notification scheduled by elapsed percentage. | Service worker schedules the chosen threshold and completion separately; verify both notices and denied permission in the installed extension. |
+| 2026-10-25 | Added a dedicated user-click permission request and loaded-manifest check; saving the timer no longer attempts to request permission implicitly. | `manifest.json` declares optional `notifications`; if the loaded extension manifest is stale the settings identify reload as the next step. Installed-extension prompt behavior remains to verify. |
 
 ## Completion record
 

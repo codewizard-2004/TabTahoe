@@ -42,6 +42,58 @@ main{display:block;flex:1;width:100%;min-width:660px;padding:14px 30px 24px}
 .widget-content .bookmark-card{min-width:0}
 .widget-content .sound-volume{max-width:100px}
 .widget-content .music-controls input{width:70px;max-width:100%}
+
+/* Phase 2 offline widgets */
+.widget-content:has(.widget-spacer){overflow:visible}
+.widget-shell.widget-spacer{background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.canvas-is-editing .widget-shell.widget-spacer{outline:1px dashed #ffffffa0;outline-offset:-3px;background:#ffffff08}
+.offline-widget-title{font-size:13px;font-weight:550;margin:0 0 10px;letter-spacing:.2px}
+.notes-widget,.timer-widget,.quote-widget,.image-widget{height:100%;min-height:0;padding:15px;display:flex;flex-direction:column;gap:9px}
+.notes-widget textarea{width:100%;flex:1;min-height:55px;resize:none;padding:10px 11px;border-radius:12px;border:1px solid var(--glass-control-border);background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight);color:#fff;font:inherit;font-size:12px;line-height:1.55}
+.notes-widget textarea::placeholder{color:#ffffff8c}
+.widget-save-status,.timer-status{font-size:10px;color:var(--muted);margin:0;min-height:14px}
+.timer-display{font-size:clamp(27px,12cqi,44px);font-variant-numeric:tabular-nums;font-weight:550;letter-spacing:-1.5px;text-align:center}
+.timer-entry,.timer-actions{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.timer-entry input{width:52px;padding:7px 4px;border-radius:9px;text-align:center;border:1px solid var(--glass-control-border);background:var(--glass-control-fill);color:#fff}
+.timer-actions button{font-size:10px;padding:6px 8px;border-radius:9px}
+.timer-actions .primary-button{width:auto;margin:0}
+.timer-actions label{font-size:10px;color:var(--muted);display:flex;gap:4px;align-items:center}
+.quote-widget blockquote{font-size:clamp(13px,4cqi,18px);line-height:1.5;margin:0;overflow:auto;flex:1;text-wrap:pretty}
+.quote-author,.quote-attribution{font-size:10px;color:var(--muted);margin:0}
+.image-widget img{width:100%;height:0;min-height:65px;flex:1;object-position:center;border-radius:12px}
+.timer-presets{display:flex;justify-content:center;align-items:center;gap:9px;margin:4px auto}
+.timer-presets button{min-width:68px;padding:8px 12px;border:1px solid var(--glass-control-border);border-radius:12px;background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight),0 4px 12px #061a221c;font-size:11px;color:#fff;backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%)}
+.timer-presets button:hover{background:var(--glass-action-fill);border-color:#ffffff60;transform:translateY(-1px)}
+.timer-widget{justify-content:flex-start}
+.timer-widget .timer-display{margin:4px 0}
+.timer-widget .timer-actions{margin-top:auto}
+.notes-layout{display:flex;gap:10px;flex:1;min-height:0}
+.notes-sidebar{display:flex;flex:1;min-width:0;min-height:0;flex-direction:column;gap:7px}
+.notes-layout.notes-editing .notes-sidebar{display:none}
+.notes-editor{display:flex;flex:1;min-width:0;min-height:0;flex-direction:column;gap:7px}
+.notes-back{width:max-content;padding:4px 3px;font-size:11px}
+.notes-sidebar>.subtle-button{width:max-content;padding:5px 8px;font-size:10px}
+.notes-list{display:flex;flex-direction:column;gap:5px;margin:0;padding:0;overflow:auto;list-style:none}
+.notes-list-item{display:grid;grid-template-columns:minmax(0,1fr) 23px 23px;align-items:center;gap:3px;padding:3px;border:1px solid var(--glass-control-border);border-radius:9px;background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight)}
+.notes-list-item .note-select{min-width:0;overflow:hidden;padding:5px 4px;border-radius:6px;text-align:left;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.notes-list-item .note-select[aria-pressed=true]{background:var(--glass-action-fill);color:#fff!important}
+.notes-list-item .note-action{width:23px;height:23px;min-width:23px;padding:0;border:1px solid var(--glass-control-border);border-radius:7px;background:var(--glass-control-fill);font-size:11px}
+.notes-list-item input{grid-column:1/-1;min-width:0;width:100%;padding:5px;border:1px solid var(--glass-control-border);border-radius:6px;background:var(--glass-control-fill);color:#fff;font-size:10px}
+.notes-layout textarea{flex:1;width:100%;min-width:0}
+@container (max-width:280px){.notes-layout{flex-direction:column}.notes-editor{min-height:0}.notes-editor textarea{min-height:60px}}
+.image-widget img{object-fit:cover}
+.image-dots{display:flex;justify-content:center;align-items:center;gap:8px;min-height:17px}
+.image-dot{width:8px;height:8px;min-width:8px;padding:0;border:1px solid #ffffffa0;border-radius:50%;background:#ffffff35;box-shadow:0 1px 5px #0003}
+.image-dot[aria-current=true]{width:18px;border-color:#d9f5e9;background:#d9f5e9;border-radius:8px}
+.image-dot:hover{background:var(--glass-action-fill);transform:scale(1.1)}
+.widget-settings-extras{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.widget-settings-extras>label{font-size:12px;color:#ffffffd9}
+.widget-settings-extras input[type=file]{display:block;width:100%;margin-top:7px;padding:8px;border:1px solid var(--glass-control-border);border-radius:11px;background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight);color:#fff}
+.widget-settings-extras .subtle-button{width:max-content}
+.image-settings-list{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow:auto}
+.image-settings-row{display:flex;align-items:center;gap:8px;padding:4px 7px 4px 10px;border:1px solid var(--glass-control-border);border-radius:10px;background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight);font-size:11px}
+.image-settings-row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.image-settings-row .icon-button{width:25px;height:25px;min-width:25px}
 .widget-edit-controls{position:absolute;left:5px;right:5px;top:-14px;z-index:5;display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--glass-border);border-radius:12px;background:var(--glass-fill);box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-filter);visibility:hidden;pointer-events:none}
 .canvas-is-editing .widget-edit-controls{visibility:visible;pointer-events:auto}
 .widget-edit-controls button{flex:0 0 auto;width:28px;height:28px;padding:3px;font-size:14px}

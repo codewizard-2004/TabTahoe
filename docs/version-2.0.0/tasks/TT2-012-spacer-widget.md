@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P1
-- **Status:** Todo
+- **Status:** In progress — implementation added; verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-007](TT2-007-drag-resize-and-collisions.md), [TT2-008](TT2-008-responsive-layouts.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -32,7 +32,7 @@ Inspect normal/edit modes, collision handling, saved gaps, keyboard selection, a
 ## Progress checklist
 
 - [ ] Confirm implementation details and resolve story-specific open questions.
-- [ ] Implement the agreed scope.
+- [x] Implement the agreed scope.
 - [ ] Complete acceptance criteria and appropriate verification.
 - [ ] Record evidence, limitations, and relevant documentation changes.
 - [ ] Update this story and the central plan to Done.
@@ -43,6 +43,7 @@ Inspect normal/edit modes, collision handling, saved gaps, keyboard selection, a
 | --- | --- | --- |
 | 2026-10-24 | Story created; implementation has not started. | Planning only. |
 | 2026-10-24 | Applied PC/desktop-only scope clarification; mobile/tablet layouts and touch-specific optimization are excluded. | Documentation only; implementation status unchanged. |
+| 2026-10-25 | Registered a content-free spacer with independent grid geometry and edit-only outline styling. | Code added; verify intentional gaps and keyboard editing in the browser. |
 
 ## Completion record
 

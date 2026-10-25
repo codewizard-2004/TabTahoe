@@ -217,7 +217,7 @@ dialog input:not([type=checkbox]):not([type=range]):not([type=color]),dialog sel
 }
 dialog input::placeholder{color:#ffffff8c}
 dialog input:not([type=checkbox]):not([type=range]):not([type=color]):hover,dialog select:hover{border-color:#ffffff50}
-dialog input:focus-visible,dialog select:focus-visible{outline:2px solid #c8eee2b3;outline-offset:2px}
+dialog input:focus-visible,dialog select:focus-visible,textarea:focus-visible{outline:2px solid #c8eee2b3;outline-offset:2px}
 /* Native select popups are OS-owned and need an opaque legible fallback. */
 dialog select option{background:#263c46;color:#fff}
 dialog input[type=color]{width:100%;height:38px;padding:5px;border:1px solid var(--glass-control-border);border-radius:11px;background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight)}

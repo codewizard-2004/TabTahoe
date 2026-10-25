@@ -6,6 +6,7 @@ import { mountFavourites } from './favourites.js';
 import { mountBookmarks } from './bookmarks.js';
 import { mountWeather } from './weather.js';
 import { mountSound } from './sound.js';
+import { registerOfflineWidgets } from './offline.js';
 
 function mountClock(context) {
   const { $ } = createWidgetView(context, 'clock');
@@ -77,5 +78,6 @@ export function registerDashboardWidgets(services) {
       resize(context, size) { context.state.controller?.resize?.(size); },
     });
   }
+  registerOfflineWidgets(registry, services);
   return registry;
 }
