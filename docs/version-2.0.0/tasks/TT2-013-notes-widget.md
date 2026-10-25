@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P1
-- **Status:** In progress — implementation added; verification pending
+- **Status:** Done — implementation complete; verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-002](TT2-002-widget-registry-and-lifecycle.md), [TT2-003](TT2-003-versioned-storage-and-migration.md), [TT2-005](TT2-005-glass-shell-and-widget-gallery.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -49,9 +49,10 @@ Verify independent notes, save/reload, simultaneous tabs, resize while typing, s
 | 2026-10-25 | Expanded Notes to hold up to 50 individually titled notes with compact add/rename/delete controls and persistent selection content. | Code added; verify multiple-note CRUD and cross-tab behavior. |
 | 2026-10-25 | Reworked the widget into a note list beside the selected note editor, placing rename and delete icons on each list row. | Code added; visual review remains pending. |
 | 2026-10-25 | Changed Notes to open in list-only mode; selecting a note switches to its editor, and a back button returns to the list. Adding or deleting a note keeps the widget in list view. | Code updated; visual and interaction review remains pending. |
+| 2026-10-26 | Marked Done at the user's direction. | Implementation is in `0475461`; persistence, CRUD, cross-tab, storage failure, and visual checks remain pending. |
 
 ## Completion record
 
-- Implementation / PR: Pending
-- Verification evidence: Pending
-- Remaining limitations: Pending
+- Implementation / PR: Commit `0475461` (`feat: Implement offline widgets for notes, quotes, and image carousel`)
+- Verification evidence: Not run for this completion update.
+- Remaining limitations: Verify note lifecycle, persistence, failure recovery, and simultaneous tabs.

@@ -2,7 +2,7 @@
 
 - **Planning baseline:** 2026-10-24
 - **Working branch:** `tabtahoe-canvas` (user-provided)
-- **Overall status:** Phase 1 Canvas Foundation is complete (TT2-001–009 and TT2-027–029). The remaining phases and release verification are in progress.
+- **Overall status:** Phases 1 and 2 are complete (TT2-001–015 and TT2-027–029). Phase 3 and release verification are in progress.
 - **Target release:** 2.0.0
 - **Delivery scope:** Phases 1–3 plus release verification.
 - **Future roadmap:** Phase 4; not a prerequisite for releasing the core canvas.
@@ -151,7 +151,7 @@ Statuses: **Todo**, **In progress**, **Blocked**, **Done**, **Roadmap**. A check
 
 Priorities: **P0** foundational/release-critical; **P1** planned core feature/polish; **P2** discovery/future work. P1 is part of the release scope, not an automatic deferral. No deadlines or estimates are committed in this planning baseline.
 
-Current totals: **12/24 core stories Done**, **5 roadmap stories**. Phase 1: **12/12 Done**. See the [canvas foundation decision and verification record](canvas-foundation.md) and [storage and named-layout implementation record](storage-and-named-layouts.md). The 2.0.0 implementation remains in development; package release versions have not been changed.
+Current totals: **18/24 core stories Done**, **5 roadmap stories**. Phase 1: **12/12 Done**. Phase 2: **6/6 Done**. Acceptance and installed-extension verification for TT2-010–015 remains outstanding; see each story’s completion record. See the [canvas foundation decision and verification record](canvas-foundation.md) and [storage and named-layout implementation record](storage-and-named-layouts.md). The 2.0.0 implementation remains in development; package release versions have not been changed.
 
 | Done | ID / story | Phase | Priority | Status |
 | --- | --- | --- | --- | --- |
@@ -167,12 +167,12 @@ Current totals: **12/24 core stories Done**, **5 roadmap stories**. Phase 1: **1
 | [x] | [TT2-027: Unify canvas customization and widget settings](tasks/TT2-027-unified-customization.md) | Canvas foundation | P0 | Done |
 | [x] | [TT2-028: Let the canvas fill the desktop window](tasks/TT2-028-fill-desktop-canvas.md) | Canvas foundation | P0 | Done |
 | [x] | [TT2-029: Make the dashboard top bar an optional widget](tasks/TT2-029-optional-topbar-widget.md) | Canvas foundation | P0 | Done |
-| [ ] | [TT2-010: Add a duration countdown timer with an alarm](tasks/TT2-010-duration-countdown-timer.md) | Offline widgets | P0 | In progress; verification pending |
-| [ ] | [TT2-011: Support timer completion when the dashboard is closed](tasks/TT2-011-timer-background-alerts.md) | Offline widgets | P0 | In progress; installed-extension verification pending |
-| [ ] | [TT2-012: Add an invisible spacer widget](tasks/TT2-012-spacer-widget.md) | Offline widgets | P1 | In progress; verification pending |
-| [ ] | [TT2-013: Add an autosaving notes widget](tasks/TT2-013-notes-widget.md) | Offline widgets | P1 | In progress; verification pending |
-| [ ] | [TT2-014: Add an API-backed quote widget with an offline fallback](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | In progress; verification pending |
-| [ ] | [TT2-015: Add a local image viewer widget](tasks/TT2-015-image-viewer-widget.md) | Offline widgets | P1 | In progress; verification pending |
+| [x] | [TT2-010: Add a duration countdown timer with an alarm](tasks/TT2-010-duration-countdown-timer.md) | Offline widgets | P0 | Done; runtime verification pending |
+| [x] | [TT2-011: Support timer completion when the dashboard is closed](tasks/TT2-011-timer-background-alerts.md) | Offline widgets | P0 | Done; installed-extension verification pending |
+| [x] | [TT2-012: Add an invisible spacer widget](tasks/TT2-012-spacer-widget.md) | Offline widgets | P1 | Done; verification pending |
+| [x] | [TT2-013: Add an autosaving notes widget](tasks/TT2-013-notes-widget.md) | Offline widgets | P1 | Done; verification pending |
+| [x] | [TT2-014: Add an API-backed quote widget with an offline fallback](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | Done; API/category verification pending |
+| [x] | [TT2-015: Add a local image viewer widget](tasks/TT2-015-image-viewer-widget.md) | Offline widgets | P1 | Done; verification pending |
 | [ ] | [TT2-016: Offer starter layouts and a recoverable reset](tasks/TT2-016-layout-presets-and-reset.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-017: Export and import validated canvas configurations](tasks/TT2-017-layout-export-and-import.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-018: Add theme-safe canvas and widget appearance controls](tasks/TT2-018-appearance-controls.md) | Customization polish | P1 | Todo |
@@ -222,3 +222,4 @@ Release only after core acceptance criteria are complete or an explicit scope ch
 | 2026-10-25 | Applied offline-widget UI refinements: actual desktop notifications for timer progress/completion with settings permission flow, a selectable notes list with per-item actions, quote font-size setting and quieter fallback UI, and carousel position dots without filenames/count text. | Code/docs updated; tests and visual/installed-extension review remain pending. |
 | 2026-10-25 | Fixed notification opt-in to request optional permission directly from its settings button and report a stale loaded manifest; changed Notes to show only the list until a note is selected, with a back control from the editor. | Code/docs updated; tests and installed-extension/visual review remain pending. |
 | 2026-10-26 | Replaced the key-required ZenQuotes request with Quotable’s documented public batch endpoint, updated host permissions/CSP and quote cache namespace, and guarded the timer notification checkbox reference after the browser permission prompt. | Code/docs updated; reload extension and verify quote API/category behavior and notification permission flow in Brave. Tests not run. |
+| 2026-10-26 | Marked TT2-010–015 and Phase 2 Done at the user's direction. | Implementation is recorded in commit `0475461`; timer, notification, quote API/category, carousel, and widget acceptance checks remain pending and are not represented as verified. |

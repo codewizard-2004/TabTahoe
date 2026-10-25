@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P0
-- **Status:** In progress — implementation added; verification pending
+- **Status:** Done — implementation complete; runtime verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-002](TT2-002-widget-registry-and-lifecycle.md), [TT2-003](TT2-003-versioned-storage-and-migration.md), [TT2-005](TT2-005-glass-shell-and-widget-gallery.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -52,9 +52,10 @@ Use controlled time for duration math, pause/resume, expiration, restored timers
 | 2026-10-25 | Added per-instance persisted deadline/paused state, presets, pause/resume/reset/dismiss/run-again, synthesized test/completion sound, mute/volume settings, and visible validation. | Code added; controlled-time and multi-tab sound ownership checks remain pending. |
 | 2026-10-25 | Applied timer settings correction: presets are centered glass controls and hidden during/after a run; settings now contain built-in/uploaded sound choice, upload/test, volume/mute, optional desktop notification permission, and configurable 90%/95% progress notification. | Code and browser alarm milestone scheduling added; installed extension verification remains pending. |
 | 2026-10-25 | Clarified desktop notification setting as the actual progress and completion notifications; permission is requested when settings are saved with notifications enabled. | Browser alarm service worker emits native extension notifications; installed extension permission and delivery review remains pending. |
+| 2026-10-26 | Marked Done at the user's direction; current settings use a dedicated notification permission button, a configurable progress percentage, completion notifications, built-in/uploaded alarm sounds, and centered presets that hide during a run. | Implementation is in `0475461`; controlled-time, audio, and installed-extension notification checks remain pending. |
 
 ## Completion record
 
-- Implementation / PR: Pending
-- Verification evidence: Pending
-- Remaining limitations: Pending
+- Implementation / PR: Commit `0475461` (`feat: Implement offline widgets for notes, quotes, and image carousel`)
+- Verification evidence: Not run for this completion update.
+- Remaining limitations: Verify duration boundaries, audio behavior, permissions, multi-tab ownership, and notifications in the installed extension.

@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P1
-- **Status:** In progress — implementation added; verification pending
+- **Status:** Done — implementation complete; verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-002](TT2-002-widget-registry-and-lifecycle.md), [TT2-003](TT2-003-versioned-storage-and-migration.md), [TT2-005](TT2-005-glass-shell-and-widget-gallery.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -49,9 +49,10 @@ Verify large/invalid uploads, missing assets, duplicate/delete/undo, offline rel
 | 2026-10-24 | Story created; implementation has not started. | Planning only. |
 | 2026-10-25 | Expanded the single-image view into a local multi-image carousel. Added add/remove management and rotation/fit settings in the widget settings dialog; files remain validated and stored in IndexedDB. | Code added; verify carousel rotation, invalid files, quota errors, duplicates, undo, and reload in the browser. |
 | 2026-10-25 | Removed visible image filenames and count text; added accessible clickable position dots. | Code added; visual review remains pending. |
+| 2026-10-26 | Marked Done at the user's direction. | Implementation is in `0475461`; upload, rotation, missing asset, quota, duplicate/undo, and visual checks remain pending. |
 
 ## Completion record
 
-- Implementation / PR: Pending
-- Verification evidence: Pending
-- Remaining limitations: Pending
+- Implementation / PR: Commit `0475461` (`feat: Implement offline widgets for notes, quotes, and image carousel`)
+- Verification evidence: Not run for this completion update.
+- Remaining limitations: Verify asset lifecycle, quota recovery, upload validation, and carousel rotation in the browser.

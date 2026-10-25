@@ -3,7 +3,7 @@
 - **Type:** Story
 - **Phase:** Offline widgets
 - **Priority:** P0
-- **Status:** In progress — implementation added; installed-extension verification pending
+- **Status:** Done — implementation complete; installed-extension verification pending
 - **Owner:** Unassigned
 - **Dependencies:** [TT2-010](TT2-010-duration-countdown-timer.md)
 - **Plan:** [Version 2.0.0 plan](../plan.md)
@@ -50,9 +50,10 @@ Verify in an installed extension with multiple new tabs, all dashboard tabs clos
 | 2026-10-25 | Added MV3 service worker deadline alarms, startup reconciliation, completion state persistence, and opt-in desktop notifications. Added alarms and optional notifications permissions and documented sleep/shutdown limitations. | Browser API implementation added; verify installed extension with permissions, closed tabs, restart, and sleep. |
 | 2026-10-25 | Moved desktop notification opt-in into timer settings and added an optional progress notification scheduled by elapsed percentage. | Service worker schedules the chosen threshold and completion separately; verify both notices and denied permission in the installed extension. |
 | 2026-10-25 | Added a dedicated user-click permission request and loaded-manifest check; saving the timer no longer attempts to request permission implicitly. | `manifest.json` declares optional `notifications`; if the loaded extension manifest is stale the settings identify reload as the next step. Installed-extension prompt behavior remains to verify. |
+| 2026-10-26 | Marked Done at the user's direction; timer notification permission and progress/completion scheduling are implemented. | Implementation is in `0475461`; installed-extension delivery, denied permissions, browser restart, and sleep reconciliation checks remain pending. |
 
 ## Completion record
 
-- Implementation / PR: Pending
-- Verification evidence: Pending
-- Remaining limitations: Pending
+- Implementation / PR: Commit `0475461` (`feat: Implement offline widgets for notes, quotes, and image carousel`)
+- Verification evidence: Not run for this completion update.
+- Remaining limitations: Verify native notification delivery and alarm reconciliation in Brave; browser alarms may be delayed by sleep or shutdown.
