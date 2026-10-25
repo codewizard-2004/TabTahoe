@@ -11,14 +11,18 @@
     "bookmarks",
     "tabs",
     "scripting",
-    "favicon"
+    "favicon",
+    "alarms"
   ],
+  "optional_permissions": ["notifications"],
+  "background": { "service_worker": "background.js", "type": "module" },
   "host_permissions": [
     "https://api.open-meteo.com/*",
-    "https://geocoding-api.open-meteo.com/*"
+    "https://geocoding-api.open-meteo.com/*",
+    "https://api.quotable.io/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; img-src 'self' data: blob: https: http:; media-src 'self' blob:;"
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://api.quotable.io; img-src 'self' data: blob: https: http:; media-src 'self' blob:;"
   },
   "optional_host_permissions": [
     "http://*/*",

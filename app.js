@@ -6,6 +6,7 @@ import { createContentStore } from './storage/content.js';
 import { createWorkspaceStore, WORKSPACE_KEY, LayoutConflictError, validateWorkspace, validateCanvas } from './storage/workspace.js';
 import { initialApps } from './storage/default-apps.js';
 import { createAppearanceControls } from './ui/appearance.js';
+import { getImageAsset, saveImageAsset, getSoundAsset, saveSoundAsset } from './storage/assets.js';
 
 const $ = selector => document.querySelector(selector);
 let toastTimer;
@@ -34,11 +35,11 @@ for (const dialog of document.querySelectorAll('dialog')) {
 const backend = createBrowserStorage();
 const content = createContentStore(backend, toast);
 let workspace, canvas, adapter, runtime, editing = false, saving = false, addingWidget = false, conflict = false, externalPending = false;
-let settingsWidgetId, renameLayoutId = null, pendingDraft = null, draftIsOutdated = false;
+let settingsWidgetId, renameLayoutId = null, pendingDraft = null, draftIsOutdated = false, settingsImageAssets = [], settingsImageAssetsLoaded = false;
 const handles = new Map();
 const history = { past: [], future: [], current: null, timer: null, announceTimer: null, applying: false };
 const draftKey = 'tabtahoe:canvas-edit-draft';
-const services = { ...content, toast, updateWidget };
+const services = { ...content, toast, updateWidget, getImage: getImageAsset, saveImage: saveImageAsset, getSound: getSoundAsset };
 const registry = registerDashboardWidgets(services);
 const store = createWorkspaceStore(backend, registry);
 const appearance = createAppearanceControls({ toast, showDialog, onSave: async preferences => {
@@ -294,6 +295,14 @@ async function addWidget(type, sourceId = null) {
       await content.saveCollection(settings.collectionId, source ? content.getCollection(source.settings.collectionId) : []);
     }
     const instance = registry.create(type, settings), definition = metadataFor(type);
+    if (source && type === 'notes') {
+      const savedNotes = await content.getWidgetContent(source.id);
+      if (savedNotes !== undefined) await content.saveWidgetContent(instance.id, structuredClone(savedNotes));
+    }
+    if (source && type === 'image') {
+      const savedImages = await content.getWidgetContent(`image-carousel:${source.id}`);
+      if (savedImages !== undefined) await content.saveWidgetContent(`image-carousel:${instance.id}`, structuredClone(savedImages));
+    }
     const layout = adapter.serialize(), y = Math.max(0, ...layout.map(item => item.y + item.h));
     const geometry = { id: instance.id, x: 0, y, ...definition.defaultSize, minW: definition.minimumSize.w, minH: definition.minimumSize.h };
     canvas = validateCanvas({ ...captureCanvas(), widgets: [...canvas.widgets, instance], layout: [...layout, geometry] }, registry);
@@ -305,7 +314,7 @@ async function addWidget(type, sourceId = null) {
   } finally { addingWidget = false; }
 }
 
-const galleryIcons = { topbar: '◭', search: '⌕', greeting: '✳', clock: '◷', weather: '☀', music: '◖', calendar: '▦', bookmarks: '⚑', favourites: '▦' };
+const galleryIcons = { topbar: '◭', search: '⌕', greeting: '✳', clock: '◷', weather: '☀', music: '◖', calendar: '▦', bookmarks: '⚑', favourites: '▦', timer: '◴', spacer: '⋯', notes: '▤', quote: '❝', image: '▧' };
 function renderGallery() {
   const gallery = $('#widget-gallery');
   gallery.replaceChildren(...registry.list().map(definition => {
@@ -332,17 +341,92 @@ function openWidgetSettings(id) {
   const instance = canvas.widgets.find(item => item.id === id), definition = metadataFor(instance.type);
   $('#widget-settings-heading').textContent = `${definition.title} settings`;
   $('#widget-settings-error').textContent = '';
-  const labels = { title: 'Title', name: 'Your name', tagline: 'Tagline', showDate: 'Show the date', hour24: 'Use a 24-hour clock', engine: 'Search engine', unit: 'Temperature unit', shortcutStyle: 'Shortcut appearance', city: 'City name', latitude: 'Latitude', longitude: 'Longitude' };
-  $('#widget-settings-fields').replaceChildren(...Object.entries(definition.settings).filter(([name]) => name !== 'collectionId').map(([name, field]) => {
+  const labels = { title: 'Title', name: 'Your name', tagline: 'Tagline', showDate: 'Show the date', hour24: 'Use a 24-hour clock', engine: 'Search engine', unit: 'Temperature unit', shortcutStyle: 'Shortcut appearance', city: 'City name', latitude: 'Latitude', longitude: 'Longitude', refreshMinutes: 'Refresh interval', category: 'Quote category', fontSize: 'Quote font size', soundType: 'Alarm sound', volume: 'Alarm volume', muted: 'Mute alarm sound', notifyAtPercent: 'Progress notification threshold', desktopNotifications: 'Send progress and completion notifications', intervalMinutes: 'Change image every' };
+  $('#widget-settings-fields').replaceChildren(...Object.entries(definition.settings).filter(([name]) => name !== 'collectionId' && name !== 'soundAssetId' && !(instance.type === 'image' && ['assetId', 'caption', 'alt'].includes(name))).map(([name, field]) => {
     const label = document.createElement('label'); label.textContent = labels[name] || name;
-    const input = document.createElement(field.choices ? 'select' : 'input'); input.name = name;
-    if (field.choices) for (const choice of field.choices) { const option = document.createElement('option'); option.value = choice; option.textContent = choice; input.append(option); }
+    const choices = field.uiChoices || field.choices;
+    const input = document.createElement(choices ? 'select' : 'input'); input.name = name;
+    const choiceLabels = { refreshMinutes: { '0': '1 day', '30': '30 minutes', '60': '1 hour', '360': '6 hours', '1440': '1 day' }, intervalMinutes: { '1': '1 minute', '5': '5 minutes', '15': '15 minutes', '30': '30 minutes', '60': '1 hour', '360': '6 hours' }, fontSize: { '12': '12 px', '14': '14 px', '16': '16 px', '18': '18 px', '20': '20 px', '24': '24 px', '28': '28 px' }, notifyAtPercent: { off: 'Off', '90': 'At 90% complete', '95': 'At 95% complete' }, soundType: { soft: 'Soft chime', digital: 'Digital double beep', bell: 'Bell tones', uploaded: 'Uploaded sound' }, category: { all: 'All quotes', happiness: 'Happiness', life: 'Life', inspiration: 'Inspiration', wisdom: 'Wisdom', success: 'Success', love: 'Love', courage: 'Courage' }, fit: { contain: 'Contain', cover: 'Cover' } };
+    if (choices) {
+      for (const choice of choices) { const option = document.createElement('option'); option.value = choice; option.textContent = choiceLabels[name]?.[choice] || choice; input.append(option); }
+      const currentValue = instance.settings[name];
+      if (!choices.includes(currentValue)) { const option = document.createElement('option'); option.value = currentValue; option.textContent = `Current setting (${currentValue})`; input.append(option); }
+    }
     else if (field.type === 'boolean') { input.type = 'checkbox'; label.className = 'check-label'; }
-    else if (field.type === 'number') { input.type = 'number'; input.step = 'any'; input.min = field.min; input.max = field.max; }
+    else if (field.type === 'number') { input.type = name === 'volume' ? 'range' : 'number'; input.step = name === 'volume' ? '0.05' : 'any'; input.min = field.min; input.max = field.max; }
     else { input.type = 'text'; input.maxLength = field.maxLength || 200; }
     if (field.type === 'boolean') input.checked = instance.settings[name]; else input.value = instance.settings[name];
     label.append(input); return label;
   }));
+  const extras = document.createElement('div'); extras.className = 'widget-settings-extras';
+  const settingsForm = $('#widget-settings-form');
+  if (instance.type === 'timer') {
+    const notificationHelp = document.createElement('p'); notificationHelp.className = 'help'; notificationHelp.textContent = 'Request browser notification permission here, then enable progress and completion alerts and save.'; extras.append(notificationHelp);
+    const notificationButton = document.createElement('button'); notificationButton.type = 'button'; notificationButton.className = 'subtle-button'; notificationButton.textContent = 'Request notification permission';
+    const notificationStatus = document.createElement('p'); notificationStatus.className = 'help'; notificationStatus.setAttribute('role', 'status');
+    notificationButton.addEventListener('click', async () => {
+      try {
+        if (!globalThis.chrome?.runtime?.id || !globalThis.chrome?.permissions) throw new Error('Open this dashboard from the installed extension to request notification permission.');
+        const manifest = chrome.runtime.getManifest();
+        const declared = manifest.optional_permissions?.includes('notifications') || manifest.permissions?.includes('notifications');
+        if (!declared) throw new Error('Reload the unpacked extension so it loads the manifest’s optional notifications permission, then try again.');
+        const granted = await chrome.permissions.request({ permissions: ['notifications'] });
+        if (!granted) { notificationStatus.textContent = 'Permission was not granted. Timers will still run without desktop notifications.'; return; }
+        const notificationsInput = settingsForm?.elements?.namedItem('desktopNotifications');
+        if (!notificationsInput) throw new Error('The timer settings form is no longer available. Close and reopen timer settings, then try again.');
+        notificationsInput.checked = true;
+        notificationStatus.textContent = 'Permission granted. Save settings to enable progress and completion notifications.';
+      } catch (error) { notificationStatus.textContent = error.message || 'Notification permission could not be requested.'; }
+    });
+    extras.append(notificationButton, notificationStatus);
+    const label = document.createElement('label'); label.textContent = 'Upload alarm sound (MP3, WAV, or OGG · up to 2 MB)';
+    const file = document.createElement('input'); file.type = 'file'; file.name = 'soundFile'; file.accept = 'audio/mpeg,audio/wav,audio/ogg,audio/mp4'; label.append(file); extras.append(label);
+    file.addEventListener('change', () => { if (file.files?.length && settingsForm?.elements?.namedItem('soundType')) settingsForm.elements.namedItem('soundType').value = 'uploaded'; });
+    const test = document.createElement('button'); test.type = 'button'; test.className = 'subtle-button'; test.textContent = 'Test selected alarm sound';
+    test.addEventListener('click', async () => {
+      try {
+        const profile = settingsForm.elements.soundType.value;
+        if (profile === 'uploaded') {
+          const blob = file.files?.[0] || (instance.settings.soundAssetId ? await getSoundAsset(instance.settings.soundAssetId) : null);
+          if (!blob) throw new Error('Upload an alarm sound before testing it.');
+          const url = URL.createObjectURL(blob), player = new Audio(url);
+          player.addEventListener('ended', () => URL.revokeObjectURL(url), { once: true });
+          player.addEventListener('error', () => { URL.revokeObjectURL(url); $('#widget-settings-error').textContent = 'This sound file could not be played.'; }, { once: true });
+          await player.play();
+        } else {
+          const context = new AudioContext(), volume = Number(settingsForm.elements.volume.value);
+        const tones = profile === 'bell' ? [660, 880, 1100] : profile === 'digital' ? [920, 620, 920] : [784, 988];
+        tones.forEach((frequency, index) => {
+          const oscillator = context.createOscillator(), gain = context.createGain(), startAt = context.currentTime + index * .35;
+          oscillator.frequency.value = frequency; gain.gain.setValueAtTime(0, startAt); gain.gain.linearRampToValueAtTime(.28 * volume, startAt + .025); gain.gain.exponentialRampToValueAtTime(.001, startAt + .28); oscillator.connect(gain); gain.connect(context.destination); oscillator.start(startAt); oscillator.stop(startAt + .3);
+        });
+        setTimeout(() => context.close(), 1600);
+        }
+      } catch (error) { $('#widget-settings-error').textContent = error.message || 'The selected sound could not be played.'; }
+    }); extras.append(test);
+  }
+  if (instance.type === 'image') {
+    settingsImageAssets = []; settingsImageAssetsLoaded = false;
+    const list = document.createElement('div'); list.className = 'image-settings-list'; list.setAttribute('aria-label', 'Carousel images');
+    const renderAssets = () => {
+      list.replaceChildren(...settingsImageAssets.map((asset, index) => {
+        const row = document.createElement('div'); row.className = 'image-settings-row';
+        const name = document.createElement('span'); name.textContent = asset.name || `Image ${index + 1}`;
+        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'icon-button'; remove.textContent = '×'; remove.setAttribute('aria-label', `Remove ${name.textContent}`); remove.title = 'Remove image';
+        remove.addEventListener('click', () => { settingsImageAssets.splice(index, 1); renderAssets(); }); row.append(name, remove); return row;
+      }));
+    };
+    const loading = document.createElement('p'); loading.className = 'help'; loading.textContent = 'Loading saved images…'; extras.append(loading, list);
+    content.getWidgetContent(`image-carousel:${instance.id}`).then(saved => {
+      if (settingsWidgetId !== id) return;
+      settingsImageAssets = Array.isArray(saved) ? saved.filter(item => item && typeof item.assetId === 'string' && typeof item.name === 'string') : [];
+      settingsImageAssetsLoaded = true;
+      loading.remove(); renderAssets();
+    }).catch(() => { loading.textContent = 'Saved image list could not be loaded.'; });
+    const uploadLabel = document.createElement('label'); uploadLabel.textContent = 'Add images to carousel';
+    const upload = document.createElement('input'); upload.type = 'file'; upload.name = 'imageFiles'; upload.multiple = true; upload.accept = 'image/jpeg,image/png,image/webp,image/gif,image/avif'; uploadLabel.append(upload); extras.append(uploadLabel);
+  }
+  if (extras.childElementCount) $('#widget-settings-fields').append(extras);
   showDialog('#widget-settings-dialog');
 }
 $('#widget-settings-form').addEventListener('submit', async event => {
@@ -352,6 +436,33 @@ $('#widget-settings-form').addEventListener('submit', async event => {
     for (const [key, field] of Object.entries(definition.settings)) {
       const input = event.currentTarget.elements[key]; if (!input) continue;
       settings[key] = field.type === 'boolean' ? input.checked : field.type === 'number' ? Number(input.value) : input.value;
+    }
+    if (instance.type === 'timer' && settings.desktopNotifications) {
+      if (!globalThis.chrome?.permissions || !await chrome.permissions.contains({ permissions: ['notifications'] })) {
+        throw new Error('Use “Request notification permission” in these settings, then save again. If the button says to reload, reload the unpacked extension first.');
+      }
+    }
+    const soundFile = event.currentTarget.elements.soundFile?.files?.[0];
+    if (soundFile) {
+      if (!/^audio\/(mpeg|wav|ogg|mp4|x-wav)$/.test(soundFile.type) || soundFile.size > 2 * 1024 * 1024) throw new Error('Choose an MP3, WAV, or OGG sound file under 2 MB.');
+      if (instance.type !== 'timer' || settings.soundType === 'uploaded') {
+        settings.soundAssetId = crypto.randomUUID(); await saveSoundAsset(settings.soundAssetId, soundFile);
+      }
+    }
+    if (instance.type === 'timer' && settings.soundType === 'uploaded' && !settings.soundAssetId) throw new Error('Upload an alarm sound or choose a built-in sound.');
+    if (instance.type === 'image') {
+      if (!settingsImageAssetsLoaded) throw new Error('Wait for the saved carousel images to load before applying settings.');
+      const files = [...(event.currentTarget.elements.imageFiles?.files || [])];
+      for (const file of files) {
+        if (!/^image\/(jpeg|png|webp|gif|avif)$/.test(file.type) || file.size > 8 * 1024 * 1024) throw new Error(`${file.name} is unsupported or exceeds 8 MB.`);
+        const probe = new Image(), previewUrl = URL.createObjectURL(file);
+        try {
+          await new Promise((resolve, reject) => { probe.onload = resolve; probe.onerror = reject; probe.src = previewUrl; });
+          if (probe.naturalWidth > 6000 || probe.naturalHeight > 6000) throw new Error(`${file.name} exceeds 6000 × 6000 pixels.`);
+        } finally { URL.revokeObjectURL(previewUrl); }
+        const assetId = crypto.randomUUID(); await saveImageAsset(assetId, file); settingsImageAssets.push({ assetId, name: file.name.slice(0, 120) });
+      }
+      await content.saveWidgetContent(`image-carousel:${instance.id}`, settingsImageAssets);
     }
     await updateWidget(instance.id, settings); $('#widget-settings-dialog').close(); announce('Widget settings applied.');
   } catch (error) { $('#widget-settings-error').textContent = error.message; }
