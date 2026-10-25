@@ -146,7 +146,12 @@ function mountQuote(context, services) {
       url.searchParams.set('limit', '50');
       if (category !== 'all') url.searchParams.set('tags', category);
       requestController = new AbortController();
-      const response = await fetch(url, { signal: requestController.signal, cache: 'no-store' });
+      const response = await fetch(url, {
+        signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(12000)]),
+        cache: 'no-store',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer'
+      });
       if (!response.ok) throw new Error('Quote API unavailable');
       const body = await response.json();
       if (!Array.isArray(body) || body.some(item => typeof item?.content !== 'string' || typeof item?.author !== 'string')) throw new Error('Unexpected quote response');
