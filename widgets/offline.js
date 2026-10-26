@@ -12,6 +12,21 @@ const fallbackQuotes = [
   { content: 'Keep your face always toward the sunshine.', author: 'Walt Whitman', category: 'happiness' },
   { content: 'Knowing yourself is the beginning of all wisdom.', author: 'Aristotle', category: 'wisdom' },
 ];
+const quoteCategoryTerms = {
+  happiness: ['happy', 'happiness', 'joy', 'joyful', 'smile', 'laugh', 'delight', 'content'],
+  life: ['life', 'living', 'live', 'time', 'day', 'death', 'world'],
+  inspiration: ['inspire', 'inspiration', 'dream', 'create', 'begin', 'start', 'possible', 'imagine'],
+  wisdom: ['wise', 'wisdom', 'knowledge', 'learn', 'mind', 'think', 'truth'],
+  success: ['success', 'achieve', 'achievement', 'goal', 'work', 'effort', 'perseverance', 'persist', 'excellence'],
+  love: ['love', 'friend', 'friendship', 'compassion', 'heart', 'kindness'],
+  courage: ['courage', 'brave', 'fear', 'risk', 'bold', 'strength', 'strong'],
+};
+
+function quoteMatchesCategory(quote, category) {
+  if (category === 'all') return true;
+  const terms = quoteCategoryTerms[category] || [];
+  return terms.some(term => new RegExp(`\\b${term}\\b`, 'i').test(quote.content));
+}
 
 function node(tag, text, className) {
   const element = document.createElement(tag);
@@ -126,7 +141,7 @@ function mountQuote(context, services) {
   quote.style.fontSize = `${context.instance.settings.fontSize}px`;
   const author = node('p', '', 'quote-author');
   const refresh = node('button', '↻ New quote', 'text-button'); refresh.type = 'button';
-  const attribution = node('a', 'Quotes from Quotable', 'quote-attribution'); attribution.href = 'https://github.com/lukePeavey/quotable'; attribution.target = '_blank'; attribution.rel = 'noopener noreferrer';
+  const attribution = node('a', 'Quotes from DummyJSON', 'quote-attribution'); attribution.href = 'https://dummyjson.com/docs/quotes'; attribution.target = '_blank'; attribution.rel = 'noopener noreferrer';
   root.append(heading, quote, author, refresh, attribution);
   let refreshTimer, manualOffset = 0, requestController;
   const show = value => { quote.textContent = `“${value.content}”`; author.textContent = `— ${value.author || 'Unknown'}`; };
@@ -134,17 +149,16 @@ function mountQuote(context, services) {
   const hash = text => [...text].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) >>> 0, 7);
   const getRefreshMinutes = () => Number(context.instance.settings.refreshMinutes) || 1440;
   const fetchBatch = async () => {
-    const { category } = context.instance.settings;
-    const cacheKey = `quotes-api-cache:quotable:${category}`;
+    const cacheKey = 'quotes-api-cache:dummyjson';
     const maxAge = getRefreshMinutes() * 60000;
     let cache = await services.getWidgetContent(cacheKey);
     if (Array.isArray(cache?.quotes) && Date.now() - cache.fetchedAt < maxAge) return cache.quotes;
     const load = async () => {
       cache = await services.getWidgetContent(cacheKey);
       if (Array.isArray(cache?.quotes) && Date.now() - cache.fetchedAt < maxAge) return cache.quotes;
-      const url = new URL('https://api.quotable.io/quotes/random');
-      url.searchParams.set('limit', '50');
-      if (category !== 'all') url.searchParams.set('tags', category);
+      const url = new URL('https://dummyjson.com/quotes');
+      url.searchParams.set('limit', '100');
+      url.searchParams.set('select', 'quote,author');
       requestController = new AbortController();
       const response = await fetch(url, {
         signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(12000)]),
@@ -154,8 +168,8 @@ function mountQuote(context, services) {
       });
       if (!response.ok) throw new Error('Quote API unavailable');
       const body = await response.json();
-      if (!Array.isArray(body) || body.some(item => typeof item?.content !== 'string' || typeof item?.author !== 'string')) throw new Error('Unexpected quote response');
-      const result = body.map(item => ({ content: item.content.slice(0, 1200), author: item.author.slice(0, 100) }));
+      if (!Array.isArray(body?.quotes) || body.quotes.some(item => typeof item?.quote !== 'string' || typeof item?.author !== 'string')) throw new Error('Unexpected quote response');
+      const result = body.quotes.map(item => ({ content: item.quote.slice(0, 1200), author: item.author.slice(0, 100) }));
       if (!result.length) throw new Error('No quotes found for that category');
       await services.saveWidgetContent(cacheKey, { quotes: result, fetchedAt: Date.now() });
       return result;
@@ -168,7 +182,9 @@ function mountQuote(context, services) {
       const selection = await services.getWidgetContent(`quote-selection:${context.instance.id}`);
       manualOffset = Number.isInteger(selection?.offset) ? selection.offset : 0;
       const batch = await fetchBatch();
-      const list = batch.length ? batch : fallbackFor(context.instance.settings.category);
+      const category = context.instance.settings.category;
+      const matching = batch.filter(item => quoteMatchesCategory(item, category));
+      const list = matching.length ? matching : fallbackFor(category);
       const period = getRefreshMinutes() * 60000;
       const bucket = Math.floor(Date.now() / period) + manualOffset;
       show(list[hash(`${context.instance.id}:${context.instance.settings.category}:${bucket}`) % list.length]);

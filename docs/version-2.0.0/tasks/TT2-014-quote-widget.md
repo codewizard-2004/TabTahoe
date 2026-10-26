@@ -49,11 +49,12 @@ Verify API success, category filters, attribution, caching, rate-limit and malfo
 | 2026-10-24 | Story created; implementation has not started. | Planning only. |
 | 2026-10-25 | Replaced the earlier quote prototype with categorized batch fetching, interval settings, deterministic interval selection, and a bundled attributed famous-person fallback. Removed personal quote entry. | Initial service choice later proved to require registered access for browser API use; see 2026-10-26 service replacement below. |
 | 2026-10-25 | Removed visible offline/fallback status copy and added a per-widget quote font-size setting. | Code added; visual review at all sizes remains pending. |
-| 2026-10-26 | Switched the remote source to Quotable’s public no-key batch endpoint after ZenQuotes rejected requests without an API key. Added the Quotable origin to extension host permissions/CSP and versioned the local cache. | Uses documented `/quotes/random` response schema and `tags` filter. Reload the unpacked extension before use; verify remote access and category results in Brave. |
+| 2026-10-26 | Switched the remote source to Quotable’s public no-key batch endpoint after ZenQuotes rejected requests without an API key. | The Quotable hostname later failed DNS resolution in the user's browser; see the 2026-10-26 provider replacement entry. |
 | 2026-10-26 | Marked Done at the user's direction. | Implementation is in `0475461`; remote fetch, category filters, cache, fallback, and installed-extension CSP checks remain pending. |
+| 2026-10-26 | Replaced the DNS-failing Quotable host with the documented no-auth DummyJSON quotes collection, capped each response at 100 items, and moved category filtering into the extension. Updated CSP, host access, and cache namespace. | DummyJSON documents its quotes list and `limit`/`select` parameters. Reload the unpacked extension; live API and category behavior remain unverified. |
 
 ## Completion record
 
 - Implementation / PR: Commit `0475461` (`feat: Implement offline widgets for notes, quotes, and image carousel`)
 - Verification evidence: Not run for this completion update.
-- Remaining limitations: Verify Quotable availability, tags returned for each category, and fallback behavior in Brave.
+- Remaining limitations: Verify DummyJSON reachability, local category matches, and fallback behavior in Brave.
