@@ -7,6 +7,9 @@ import { createWorkspaceStore, WORKSPACE_KEY, LayoutConflictError, validateWorks
 import { initialApps } from './storage/default-apps.js';
 import { createAppearanceControls } from './ui/appearance.js';
 import { getImageAsset, saveImageAsset, getSoundAsset, saveSoundAsset } from './storage/assets.js';
+import { NEWS_SOURCES } from './widgets/news.js';
+import { MARKET_COINS } from './widgets/markets.js';
+import { WORLD_CLOCK_ZONES, worldClockZoneLabel } from './widgets/world-clock.js';
 
 const $ = selector => document.querySelector(selector);
 let toastTimer;
@@ -314,11 +317,22 @@ async function addWidget(type, sourceId = null) {
   } finally { addingWidget = false; }
 }
 
-const galleryIcons = { topbar: '◭', search: '⌕', greeting: '✳', clock: '◷', weather: '☀', music: '◖', calendar: '▦', bookmarks: '⚑', favourites: '▦', timer: '◴', spacer: '⋯', notes: '▤', quote: '❝', image: '▧' };
+const galleryIcons = { topbar: '◭', search: '⌕', greeting: '✳', clock: '◷', 'world-clock': '◷', weather: '☀', music: '◖', calendar: '▦', bookmarks: '⚑', favourites: '▦', timer: '◴', spacer: '⋯', notes: '▤', quote: '❝', image: '▧', news: '▤', markets: '◈' };
+function filterGallery() {
+  const query = $('#widget-gallery-search').value.trim().toLocaleLowerCase();
+  const cards = [...$('#widget-gallery').children];
+  let visible = 0;
+  for (const card of cards) {
+    card.hidden = Boolean(query) && !card.dataset.searchText.includes(query);
+    if (!card.hidden) visible++;
+  }
+  $('#widget-gallery-empty').hidden = visible > 0;
+}
 function renderGallery() {
   const gallery = $('#widget-gallery');
   gallery.replaceChildren(...registry.list().map(definition => {
     const card = document.createElement('article'); card.className = 'widget-gallery-card glass'; card.dataset.galleryType = definition.type; card.setAttribute('role', 'listitem');
+    card.dataset.searchText = `${definition.title} ${definition.type} ${definition.description}`.toLocaleLowerCase();
     const preview = document.createElement('div'); preview.className = `widget-gallery-preview widget-gallery-${definition.type}`;
     const icon = document.createElement('span'); icon.className = 'widget-gallery-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = galleryIcons[definition.type] || '◈';
     const previewLabel = document.createElement('span'); previewLabel.textContent = definition.title;
@@ -330,11 +344,14 @@ function renderGallery() {
     add.addEventListener('click', () => addWidget(definition.type).catch(error => toast(error.message)));
     card.append(preview, title, description, size, add); return card;
   }));
+  filterGallery();
 }
 function openWidgetGallery() {
   if (!editing || saving) return;
-  renderGallery(); showDialog('#widget-gallery-dialog');
+  $('#widget-gallery-search').value = '';
+  renderGallery(); showDialog('#widget-gallery-dialog'); $('#widget-gallery-search').focus({ preventScroll: true });
 }
+$('#widget-gallery-search').addEventListener('input', filterGallery);
 
 function openWidgetSettings(id) {
   settingsWidgetId = id;
@@ -342,11 +359,11 @@ function openWidgetSettings(id) {
   $('#widget-settings-heading').textContent = `${definition.title} settings`;
   $('#widget-settings-error').textContent = '';
   const labels = { title: 'Title', name: 'Your name', tagline: 'Tagline', showDate: 'Show the date', hour24: 'Use a 24-hour clock', engine: 'Search engine', unit: 'Temperature unit', shortcutStyle: 'Shortcut appearance', city: 'City name', latitude: 'Latitude', longitude: 'Longitude', refreshMinutes: 'Refresh interval', category: 'Quote category', fontSize: 'Quote font size', soundType: 'Alarm sound', volume: 'Alarm volume', muted: 'Mute alarm sound', notifyAtPercent: 'Progress notification threshold', desktopNotifications: 'Send progress and completion notifications', intervalMinutes: 'Change image every' };
-  $('#widget-settings-fields').replaceChildren(...Object.entries(definition.settings).filter(([name]) => name !== 'collectionId' && name !== 'soundAssetId' && !(instance.type === 'image' && ['assetId', 'caption', 'alt'].includes(name))).map(([name, field]) => {
+  $('#widget-settings-fields').replaceChildren(...Object.entries(definition.settings).filter(([name]) => name !== 'collectionId' && name !== 'soundAssetId' && !(instance.type === 'news' && name === 'sources') && !(instance.type === 'markets' && ['coins', 'currency'].includes(name)) && !(instance.type === 'world-clock' && name === 'cities') && !(instance.type === 'image' && ['assetId', 'caption', 'alt'].includes(name))).map(([name, field]) => {
     const label = document.createElement('label'); label.textContent = labels[name] || name;
     const choices = field.uiChoices || field.choices;
     const input = document.createElement(choices ? 'select' : 'input'); input.name = name;
-    const choiceLabels = { refreshMinutes: { '0': '1 day', '30': '30 minutes', '60': '1 hour', '360': '6 hours', '1440': '1 day' }, intervalMinutes: { '1': '1 minute', '5': '5 minutes', '15': '15 minutes', '30': '30 minutes', '60': '1 hour', '360': '6 hours' }, fontSize: { '12': '12 px', '14': '14 px', '16': '16 px', '18': '18 px', '20': '20 px', '24': '24 px', '28': '28 px' }, notifyAtPercent: { off: 'Off', '90': 'At 90% complete', '95': 'At 95% complete' }, soundType: { soft: 'Soft chime', digital: 'Digital double beep', bell: 'Bell tones', uploaded: 'Uploaded sound' }, category: { all: 'All quotes', happiness: 'Happiness', life: 'Life', inspiration: 'Inspiration', wisdom: 'Wisdom', success: 'Success', love: 'Love', courage: 'Courage' }, fit: { contain: 'Contain', cover: 'Cover' } };
+    const choiceLabels = { refreshMinutes: { '0': '1 day', '15': '15 minutes', '30': '30 minutes', '60': '1 hour', '360': '6 hours', '1440': '1 day' }, intervalMinutes: { '1': '1 minute', '5': '5 minutes', '15': '15 minutes', '30': '30 minutes', '60': '1 hour', '360': '6 hours' }, fontSize: { '12': '12 px', '14': '14 px', '16': '16 px', '18': '18 px', '20': '20 px', '24': '24 px', '28': '28 px' }, notifyAtPercent: { off: 'Off', '90': 'At 90% complete', '95': 'At 95% complete' }, soundType: { soft: 'Soft chime', digital: 'Digital double beep', bell: 'Bell tones', uploaded: 'Uploaded sound' }, category: { all: 'All quotes', happiness: 'Happiness', life: 'Life', inspiration: 'Inspiration', wisdom: 'Wisdom', success: 'Success', love: 'Love', courage: 'Courage' }, fit: { contain: 'Contain', cover: 'Cover' } };
     if (choices) {
       for (const choice of choices) { const option = document.createElement('option'); option.value = choice; option.textContent = choiceLabels[name]?.[choice] || choice; input.append(option); }
       const currentValue = instance.settings[name];
@@ -360,6 +377,77 @@ function openWidgetSettings(id) {
   }));
   const extras = document.createElement('div'); extras.className = 'widget-settings-extras';
   const settingsForm = $('#widget-settings-form');
+  if (instance.type === 'world-clock') {
+    const help = document.createElement('p'); help.className = 'help'; help.textContent = 'Choose up to three time zones. Times are calculated locally and update every second.'; extras.append(help);
+    const selectedZones = String(instance.settings.cities || '').split(',').map(value => value.trim());
+    const list = document.createElement('div'); list.className = 'world-clock-settings'; list.setAttribute('aria-label', 'Global Clock cities');
+    for (let index = 0; index < 3; index++) {
+      const label = document.createElement('label'); label.textContent = `City ${index + 1}`;
+      const select = document.createElement('select'); select.name = 'world-clock-city';
+      const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Not selected'; select.append(empty);
+      for (const zone of WORLD_CLOCK_ZONES) {
+        const option = document.createElement('option'); option.value = zone; option.textContent = worldClockZoneLabel(zone); select.append(option);
+      }
+      select.value = WORLD_CLOCK_ZONES.includes(selectedZones[index]) ? selectedZones[index] : '';
+      label.append(select); list.append(label);
+    }
+    extras.append(list);
+  }
+  if (instance.type === 'news') {
+    const help = document.createElement('p'); help.className = 'help'; help.textContent = 'Choose the RSS sections to include. TabTahoe fetches headline, publication time, and article link directly from each selected publisher, then caches them on this device.'; extras.append(help);
+    const selectedIds = new Set(String(instance.settings.sources || 'bbc-world,guardian-world').split(',').map(value => value.trim()));
+    const sourceList = document.createElement('div'); sourceList.className = 'news-source-options'; sourceList.setAttribute('aria-label', 'RSS news sources');
+    for (const source of NEWS_SOURCES) {
+      const label = document.createElement('label'); label.className = 'news-source-option';
+      const input = document.createElement('input'); input.type = 'checkbox'; input.name = 'news-source'; input.value = source.id; input.checked = selectedIds.has(source.id);
+      const text = document.createElement('span'); text.textContent = source.label;
+      label.append(input, text); sourceList.append(label);
+    }
+    extras.append(sourceList);
+    const allow = document.createElement('button'); allow.type = 'button'; allow.className = 'subtle-button'; allow.textContent = 'Allow selected news sources';
+    const permissionStatus = document.createElement('p'); permissionStatus.className = 'help'; permissionStatus.setAttribute('role', 'status');
+    allow.addEventListener('click', async () => {
+      try {
+        const selected = [...sourceList.querySelectorAll('input:checked')].map(input => NEWS_SOURCES.find(source => source.id === input.value)).filter(Boolean);
+        if (!selected.length) throw new Error('Select at least one source first.');
+        if (!globalThis.chrome?.runtime?.id || !globalThis.chrome?.permissions) throw new Error('Feed access is available when TabTahoe is loaded as an extension in Brave or Chromium.');
+        const origins = [...new Set(selected.map(source => `${new URL(source.feed).origin}/*`))];
+        const declared = chrome.runtime.getManifest().optional_host_permissions || [];
+        if (origins.some(origin => !declared.includes(origin) && !declared.includes('https://*/*'))) throw new Error('Reload the unpacked extension to load the selected feed permissions.');
+        const request = chrome.permissions.request({ origins });
+        const granted = await request;
+        permissionStatus.textContent = granted ? 'Access granted. Apply settings to load these headlines.' : 'Access was not granted. News feeds remain disabled until you allow them.';
+      } catch (error) { permissionStatus.textContent = error.message || 'Feed access could not be requested.'; }
+    });
+    extras.append(allow, permissionStatus);
+  }
+  if (instance.type === 'markets') {
+    const help = document.createElement('p'); help.className = 'help'; help.textContent = 'Choose cryptocurrencies to follow, set your display currency, and choose how often prices refresh. Quotes are informational and can be delayed.'; extras.append(help);
+    const selectedCoins = new Set(String(instance.settings.coins || 'btc-bitcoin,eth-ethereum,sol-solana').split(',').map(value => value.trim()));
+    const coinList = document.createElement('div'); coinList.className = 'market-coin-options'; coinList.setAttribute('aria-label', 'Cryptocurrencies');
+    for (const coin of MARKET_COINS) {
+      const label = document.createElement('label'); label.className = 'market-coin-option';
+      const input = document.createElement('input'); input.type = 'checkbox'; input.name = 'market-coin'; input.value = coin.id; input.checked = selectedCoins.has(coin.id);
+      const text = document.createElement('span'); text.textContent = `${coin.name} (${coin.symbol})`; label.append(input, text); coinList.append(label);
+    }
+    const currencyLabel = document.createElement('label'); currencyLabel.textContent = 'Crypto display currency';
+    const currency = document.createElement('select'); currency.name = 'market-currency';
+    for (const code of ['USD', 'EUR', 'GBP', 'INR', 'JPY', 'CAD', 'AUD']) { const option = document.createElement('option'); option.value = code; option.textContent = code; currency.append(option); }
+    currency.value = instance.settings.currency || 'USD'; currencyLabel.append(currency); extras.append(coinList, currencyLabel);
+    const permissionButton = document.createElement('button'); permissionButton.type = 'button'; permissionButton.className = 'subtle-button'; permissionButton.textContent = 'Allow crypto price access';
+    const permissionStatus = document.createElement('p'); permissionStatus.className = 'help'; permissionStatus.setAttribute('role', 'status');
+    permissionButton.addEventListener('click', async () => {
+      try {
+        const hasCrypto = Boolean(coinList.querySelector('input:checked'));
+        if (!hasCrypto) throw new Error('Choose at least one cryptocurrency first.');
+        if (!globalThis.chrome?.runtime?.id || !globalThis.chrome?.permissions) throw new Error('Crypto price access is available when TabTahoe is loaded as an extension in Brave or Chromium.');
+        const request = chrome.permissions.request({ origins: ['https://api.coinpaprika.com/*'] });
+        const granted = await request;
+        permissionStatus.textContent = granted ? 'Access granted. Apply settings to load crypto prices.' : 'Access was not granted. Crypto prices remain disabled until you allow access.';
+      } catch (error) { permissionStatus.textContent = error.message || 'Crypto price access could not be requested.'; }
+    });
+    extras.append(permissionButton, permissionStatus);
+  }
   if (instance.type === 'timer') {
     const notificationHelp = document.createElement('p'); notificationHelp.className = 'help'; notificationHelp.textContent = 'Request browser notification permission here, then enable progress and completion alerts and save.'; extras.append(notificationHelp);
     const notificationButton = document.createElement('button'); notificationButton.type = 'button'; notificationButton.className = 'subtle-button'; notificationButton.textContent = 'Request notification permission';
@@ -381,11 +469,13 @@ function openWidgetSettings(id) {
     extras.append(notificationButton, notificationStatus);
     const label = document.createElement('label'); label.textContent = 'Upload alarm sound (MP3, WAV, or OGG · up to 2 MB)';
     const file = document.createElement('input'); file.type = 'file'; file.name = 'soundFile'; file.accept = 'audio/mpeg,audio/wav,audio/ogg,audio/mp4'; label.append(file); extras.append(label);
-    file.addEventListener('change', () => { if (file.files?.length && settingsForm?.elements?.namedItem('soundType')) settingsForm.elements.namedItem('soundType').value = 'uploaded'; });
+    file.addEventListener('change', () => { const soundType = settingsForm?.elements?.namedItem('soundType'); if (file.files?.length && soundType) soundType.value = 'uploaded'; });
     const test = document.createElement('button'); test.type = 'button'; test.className = 'subtle-button'; test.textContent = 'Test selected alarm sound';
     test.addEventListener('click', async () => {
       try {
-        const profile = settingsForm.elements.soundType.value;
+        const soundType = settingsForm?.elements?.namedItem('soundType');
+        if (!soundType) throw new Error('Timer settings are no longer available. Close and reopen timer settings, then try again.');
+        const profile = soundType.value;
         if (profile === 'uploaded') {
           const blob = file.files?.[0] || (instance.settings.soundAssetId ? await getSoundAsset(instance.settings.soundAssetId) : null);
           if (!blob) throw new Error('Upload an alarm sound before testing it.');
@@ -394,7 +484,9 @@ function openWidgetSettings(id) {
           player.addEventListener('error', () => { URL.revokeObjectURL(url); $('#widget-settings-error').textContent = 'This sound file could not be played.'; }, { once: true });
           await player.play();
         } else {
-          const context = new AudioContext(), volume = Number(settingsForm.elements.volume.value);
+          const volumeInput = settingsForm?.elements?.namedItem('volume');
+          if (!volumeInput) throw new Error('Timer volume setting is no longer available. Close and reopen timer settings, then try again.');
+          const context = new AudioContext(), volume = Number(volumeInput.value);
         const tones = profile === 'bell' ? [660, 880, 1100] : profile === 'digital' ? [920, 620, 920] : [784, 988];
         tones.forEach((frequency, index) => {
           const oscillator = context.createOscillator(), gain = context.createGain(), startAt = context.currentTime + index * .35;
@@ -431,10 +523,11 @@ function openWidgetSettings(id) {
 }
 $('#widget-settings-form').addEventListener('submit', async event => {
   event.preventDefault();
+  const form = event.currentTarget;
   try {
     const instance = canvas.widgets.find(item => item.id === settingsWidgetId), definition = metadataFor(instance.type), settings = { ...instance.settings };
     for (const [key, field] of Object.entries(definition.settings)) {
-      const input = event.currentTarget.elements[key]; if (!input) continue;
+      const input = form.elements.namedItem(key); if (!input) continue;
       settings[key] = field.type === 'boolean' ? input.checked : field.type === 'number' ? Number(input.value) : input.value;
     }
     if (instance.type === 'timer' && settings.desktopNotifications) {
@@ -442,7 +535,32 @@ $('#widget-settings-form').addEventListener('submit', async event => {
         throw new Error('Use “Request notification permission” in these settings, then save again. If the button says to reload, reload the unpacked extension first.');
       }
     }
-    const soundFile = event.currentTarget.elements.soundFile?.files?.[0];
+    if (instance.type === 'news') {
+      const selected = [...form.querySelectorAll('[name="news-source"]:checked')].map(input => input.value).filter(id => NEWS_SOURCES.some(source => source.id === id));
+      if (!selected.length) throw new Error('Select at least one news source.');
+      settings.sources = [...new Set(selected)].join(',');
+      if (globalThis.chrome?.permissions) {
+        const origins = [...new Set(selected.map(id => `${new URL(NEWS_SOURCES.find(source => source.id === id).feed).origin}/*`))];
+        if (!await chrome.permissions.contains({ origins })) throw new Error('Use “Allow selected news sources” in these settings, then apply again.');
+      }
+    }
+    if (instance.type === 'markets') {
+      const selectedCoins = [...new Set([...form.querySelectorAll('[name="market-coin"]:checked')].map(input => input.value).filter(id => MARKET_COINS.some(coin => coin.id === id)))];
+      if (!selectedCoins.length) throw new Error('Choose at least one cryptocurrency.');
+      settings.coins = selectedCoins.join(',');
+      settings.currency = form.elements.namedItem('market-currency')?.value || 'USD';
+      if (globalThis.chrome?.permissions) {
+        if (!await chrome.permissions.contains({ origins: ['https://api.coinpaprika.com/*'] })) throw new Error('Use “Allow crypto price access” in these settings, then apply again.');
+      }
+    }
+    if (instance.type === 'world-clock') {
+      const selectedZones = [...form.querySelectorAll('[name="world-clock-city"]')].map(input => input.value).filter(Boolean);
+      if (!selectedZones.length) throw new Error('Choose at least one city.');
+      if (new Set(selectedZones).size !== selectedZones.length) throw new Error('Choose a different time zone in each city slot.');
+      if (selectedZones.some(zone => !WORLD_CLOCK_ZONES.includes(zone))) throw new Error('Choose valid time zones from the list.');
+      settings.cities = selectedZones.join(',');
+    }
+    const soundFile = form.elements.namedItem('soundFile')?.files?.[0];
     if (soundFile) {
       if (!/^audio\/(mpeg|wav|ogg|mp4|x-wav)$/.test(soundFile.type) || soundFile.size > 2 * 1024 * 1024) throw new Error('Choose an MP3, WAV, or OGG sound file under 2 MB.');
       if (instance.type !== 'timer' || settings.soundType === 'uploaded') {
@@ -452,7 +570,7 @@ $('#widget-settings-form').addEventListener('submit', async event => {
     if (instance.type === 'timer' && settings.soundType === 'uploaded' && !settings.soundAssetId) throw new Error('Upload an alarm sound or choose a built-in sound.');
     if (instance.type === 'image') {
       if (!settingsImageAssetsLoaded) throw new Error('Wait for the saved carousel images to load before applying settings.');
-      const files = [...(event.currentTarget.elements.imageFiles?.files || [])];
+      const files = [...(form.elements.namedItem('imageFiles')?.files || [])];
       for (const file of files) {
         if (!/^image\/(jpeg|png|webp|gif|avif)$/.test(file.type) || file.size > 8 * 1024 * 1024) throw new Error(`${file.name} is unsupported or exceeds 8 MB.`);
         const probe = new Image(), previewUrl = URL.createObjectURL(file);

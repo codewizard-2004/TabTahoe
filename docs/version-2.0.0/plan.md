@@ -2,7 +2,7 @@
 
 - **Planning baseline:** 2026-10-24
 - **Working branch:** `tabtahoe-canvas` (user-provided)
-- **Overall status:** Phases 1 and 2 are complete (TT2-001–015 and TT2-027–029). Phase 3 and release verification are in progress.
+- **Overall status:** Phases 1 and 2 are complete. Phase 3 Customization Polish is deferred by user direction. TT2-021/022 connected widgets and the TT2-024 Global Clock slice are active; remaining TT2-024 productivity candidates stay deferred.
 - **Target release:** 2.0.0
 - **Delivery scope:** Phases 1–3 plus release verification.
 - **Future roadmap:** Phase 4; not a prerequisite for releasing the core canvas.
@@ -141,7 +141,7 @@ Deferred: free pixel placement, overlapping layers, nested canvas sections, date
 | Sound with every dashboard closed | Defer unless offscreen audio is required and verified | TT2-011 |
 | Export contents | Versioned configuration and documented portable text; omit secrets and image blobs | TT2-017 |
 | Performance budgets and supported widget count | Measure representative canvases before fixing limits | TT2-020 |
-| News/stocks providers and credentials | Investigate current terms before committing | TT2-021 / TT2-022 |
+| News/crypto providers and credentials | Feed/API sources selected provisionally; verify provider and logo terms before release | TT2-021 / TT2-022 |
 
 ## Progress tracking
 
@@ -151,7 +151,7 @@ Statuses: **Todo**, **In progress**, **Blocked**, **Done**, **Roadmap**. A check
 
 Priorities: **P0** foundational/release-critical; **P1** planned core feature/polish; **P2** discovery/future work. P1 is part of the release scope, not an automatic deferral. No deadlines or estimates are committed in this planning baseline.
 
-Current totals: **18/24 core stories Done**, **5 roadmap stories**. Phase 1: **12/12 Done**. Phase 2: **6/6 Done**. Acceptance and installed-extension verification for TT2-010–015 remains outstanding; see each story’s completion record. See the [canvas foundation decision and verification record](canvas-foundation.md) and [storage and named-layout implementation record](storage-and-named-layouts.md). The 2.0.0 implementation remains in development; package release versions have not been changed.
+Current totals: **18/25 core stories Done**, **4 roadmap stories**. Phase 1: **12/12 Done**. Phase 2: **6/6 Done**. TT2-021 is active; TT2-022 is next for provider feasibility. Acceptance and installed-extension verification for TT2-010–015 remains outstanding; see each story’s completion record. See the [canvas foundation decision and verification record](canvas-foundation.md) and [storage and named-layout implementation record](storage-and-named-layouts.md). The 2.0.0 implementation remains in development; package release versions have not been changed.
 
 | Done | ID / story | Phase | Priority | Status |
 | --- | --- | --- | --- | --- |
@@ -167,21 +167,21 @@ Current totals: **18/24 core stories Done**, **5 roadmap stories**. Phase 1: **1
 | [x] | [TT2-027: Unify canvas customization and widget settings](tasks/TT2-027-unified-customization.md) | Canvas foundation | P0 | Done |
 | [x] | [TT2-028: Let the canvas fill the desktop window](tasks/TT2-028-fill-desktop-canvas.md) | Canvas foundation | P0 | Done |
 | [x] | [TT2-029: Make the dashboard top bar an optional widget](tasks/TT2-029-optional-topbar-widget.md) | Canvas foundation | P0 | Done |
-| [x] | [TT2-010: Add a duration countdown timer with an alarm](tasks/TT2-010-duration-countdown-timer.md) | Offline widgets | P0 | Done; runtime verification pending |
-| [x] | [TT2-011: Support timer completion when the dashboard is closed](tasks/TT2-011-timer-background-alerts.md) | Offline widgets | P0 | Done; installed-extension verification pending |
-| [x] | [TT2-012: Add an invisible spacer widget](tasks/TT2-012-spacer-widget.md) | Offline widgets | P1 | Done; verification pending |
-| [x] | [TT2-013: Add an autosaving notes widget](tasks/TT2-013-notes-widget.md) | Offline widgets | P1 | Done; verification pending |
-| [x] | [TT2-014: Add an API-backed quote widget with an offline fallback](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | Done; API/category verification pending |
-| [x] | [TT2-015: Add a local image viewer widget](tasks/TT2-015-image-viewer-widget.md) | Offline widgets | P1 | Done; verification pending |
+| [x] | [TT2-010: Add a duration countdown timer with an alarm](tasks/TT2-010-duration-countdown-timer.md) | Offline widgets | P0 | Done |
+| [x] | [TT2-011: Support timer completion when the dashboard is closed](tasks/TT2-011-timer-background-alerts.md) | Offline widgets | P0 | Done |
+| [x] | [TT2-012: Add an invisible spacer widget](tasks/TT2-012-spacer-widget.md) | Offline widgets | P1 | Done |
+| [x] | [TT2-013: Add an autosaving notes widget](tasks/TT2-013-notes-widget.md) | Offline widgets | P1 | Done |
+| [x] | [TT2-014: Add an API-backed quote widget with an offline fallback](tasks/TT2-014-quote-widget.md) | Offline widgets | P1 | Bug |
+| [x] | [TT2-015: Add a local image viewer widget](tasks/TT2-015-image-viewer-widget.md) | Offline widgets | P1 | Done |
 | [ ] | [TT2-016: Offer starter layouts and a recoverable reset](tasks/TT2-016-layout-presets-and-reset.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-017: Export and import validated canvas configurations](tasks/TT2-017-layout-export-and-import.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-018: Add theme-safe canvas and widget appearance controls](tasks/TT2-018-appearance-controls.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-019: Polish widget duplication, locking, and settings](tasks/TT2-019-duplicate-lock-and-settings.md) | Customization polish | P1 | Todo |
 | [ ] | [TT2-020: Keep large canvases responsive and recoverable](tasks/TT2-020-performance-and-resilience.md) | Customization polish | P0 | Todo |
-| [ ] | [TT2-021: Investigate and add news headlines](tasks/TT2-021-news-headlines-roadmap.md) | Connected and advanced roadmap | P2 | Roadmap |
-| [ ] | [TT2-022: Investigate and add a stock watchlist](tasks/TT2-022-stock-watchlist-roadmap.md) | Connected and advanced roadmap | P2 | Roadmap |
+| [ ] | [TT2-021: Investigate and add news headlines](tasks/TT2-021-news-headlines-roadmap.md) | Connected and advanced roadmap | P1 | In progress; source expansion added, verification pending |
+| [ ] | [TT2-022: Add a crypto watchlist; defer stocks](tasks/TT2-022-stock-watchlist-roadmap.md) | Connected and advanced roadmap | P1 | Crypto-only tracker added; stocks deferred; verification pending |
 | [ ] | [TT2-023: Design a theme-safe custom content widget](tasks/TT2-023-custom-content-roadmap.md) | Connected and advanced roadmap | P2 | Roadmap |
-| [ ] | [TT2-024: Prioritize additional productivity widgets](tasks/TT2-024-additional-widgets-roadmap.md) | Connected and advanced roadmap | P2 | Roadmap |
+| [ ] | [TT2-024: Add a Global Clock widget](tasks/TT2-024-additional-widgets-roadmap.md) | Connected and advanced roadmap | P2 | In progress — Global Clock slice; verification pending |
 | [ ] | [TT2-025: Evaluate advanced canvas features after the grid release](tasks/TT2-025-advanced-canvas-roadmap.md) | Connected and advanced roadmap | P2 | Roadmap |
 | [ ] | [TT2-026: Verify and document the version 2.0.0 release](tasks/TT2-026-release-verification-and-docs.md) | Release gate | P0 | Todo |
 
@@ -190,8 +190,8 @@ Current totals: **18/24 core stories Done**, **5 roadmap stories**. Phase 1: **1
 1. TT2-001 engine decision → TT2-002 registry → TT2-003 persistence/migration.
 2. TT2-004 existing feature conversion → TT2-005 shell/gallery → TT2-006 edit history → TT2-007 placement → TT2-008 desktop window sizing → TT2-009 keyboard review → TT2-027 unified customization → TT2-028 desktop fill area → TT2-029 optional top bar widget.
 3. TT2-010 duration timer → TT2-011 background alerts; add TT2-012–TT2-015 offline widgets once their foundation dependencies are ready.
-4. TT2-016–TT2-019 customization polish → TT2-020 performance/resilience → TT2-026 release verification.
-5. Revisit TT2-021–TT2-025 after the core experience is stable and provider/product decisions are available.
+4. Per user direction, defer TT2-016–TT2-020 Customization Polish and promote TT2-021 news headlines. TT2-021 uses its own bounded fetch/cache and error isolation, so TT2-020 is no longer a blocking dependency for this slice.
+5. Per user direction, promote TT2-022 and implement a crypto-only tracker while TT2-021 verification remains pending; defer stock tracking. Verify both connected widgets and their provider terms before release; complete deferred polish and TT2-026 release verification before release.
 
 These are implementation dependencies, not a request to delegate work to agents. Verify each story's explicit dependency list before starting it.
 
@@ -201,7 +201,7 @@ Add meaningful pure tests for layout validation, migration, history, timer calcu
 
 Use browser checks for add/edit/move/resize/persistence and targeted integration scenarios. Verify real bookmarks, media controls, service-worker alarms, notifications, and browser permissions in the installed extension; a web preview cannot establish those behaviors.
 
-Manually review desktop layouts, resized/short desktop windows, browser zoom, keyboard use, reduced motion, opacity extremes, light/dark wallpapers, and all existing dialogs: Customize, weather search/results, add/edit shortcut, new/rename group, group contents, calendar tasks including completed items, and bookmarks. Include the new gallery, widget editors, timers, notes, quotes, images, presets, and import feedback. Keep screenshots under ignored `test-results/`.
+Manually review desktop layouts, resized/short desktop windows, browser zoom, keyboard use, reduced motion, opacity extremes, light/dark wallpapers, and all existing dialogs: Customize, weather search/results, add/edit shortcut, new/rename group, group contents, calendar tasks including completed items, and bookmarks. Include the new gallery, widget editors, timers, notes, quotes, images, news headline feeds, presets, and import feedback. Keep screenshots under ignored `test-results/`.
 
 Test fresh install and representative version 1 migration, reload/restart, multi-tab changes, denied permissions, offline state, missing assets, and storage failures. Record actual evidence in the owning story. Follow the user's current verification preferences; if they choose to test themselves, provide the checklist and record results without running tests on their behalf.
 
@@ -223,3 +223,5 @@ Release only after core acceptance criteria are complete or an explicit scope ch
 | 2026-10-25 | Fixed notification opt-in to request optional permission directly from its settings button and report a stale loaded manifest; changed Notes to show only the list until a note is selected, with a back control from the editor. | Code/docs updated; tests and installed-extension/visual review remain pending. |
 | 2026-10-26 | Replaced the key-required ZenQuotes request with Quotable’s documented public batch endpoint, updated host permissions/CSP and quote cache namespace, and guarded the timer notification checkbox reference after the browser permission prompt. | Code/docs updated; reload extension and verify quote API/category behavior and notification permission flow in Brave. Tests not run. |
 | 2026-10-26 | Marked TT2-010–015 and Phase 2 Done at the user's direction. | Implementation is recorded in commit `0475461`; timer, notification, quote API/category, carousel, and widget acceptance checks remain pending and are not represented as verified. |
+| 2026-10-26 | Deferred Customization Polish and promoted TT2-021 News Headlines per user direction. Implemented a curated BBC/Guardian RSS headline list with optional source-host access, publisher attribution, bounded shared caching, stale-state handling, and safe article links. TT2-022 is the next provider investigation. | Code/docs updated; no tests or installed-extension verification run. TT2-020 was removed as a hard dependency for this isolated widget slice. |
+| 2026-10-26 | Replaced the DNS-failing Quotable quote host with DummyJSON's documented no-auth quotes collection, bounded to 100 records with on-device category filtering. News feed CSP origins are present in the workspace manifest. | The console's CSP still shows an older loaded manifest; reload the unpacked extension. No live quote/feed requests were verified. |

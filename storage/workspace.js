@@ -7,6 +7,27 @@ export const COLLECTION_PREFIX = 'canvasCollection:';
 export const DEFAULT_COLLECTION = 'migrated-favourites';
 export const isStableId = value => typeof value === 'string' && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/.test(value);
 
+const LEGACY_CRYPTO_IDS = {
+  bitcoin: 'btc-bitcoin', ethereum: 'eth-ethereum', tether: 'usdt-tether', solana: 'sol-solana',
+  binancecoin: 'bnb-binance-coin', ripple: 'xrp-xrp', dogecoin: 'doge-dogecoin', 'usd-coin': 'usdc-usd-coin',
+  cardano: 'ada-cardano', tron: 'trx-tron', 'avalanche-2': 'avax-avalanche', chainlink: 'link-chainlink',
+};
+const MARKET_CURRENCIES = ['USD', 'EUR', 'GBP', 'INR', 'JPY', 'CAD', 'AUD'];
+
+function migrateMarketWidget(item) {
+  if (item?.type !== 'markets') return item;
+  const settings = item.settings || {};
+  const coins = String(settings.coins || 'bitcoin,ethereum,solana').split(',')
+    .map(id => LEGACY_CRYPTO_IDS[id.trim()] || id.trim()).filter(id => /^[a-z0-9-]+$/.test(id)).join(',');
+  const interval = Number(settings.refreshMinutes);
+  return { ...item, settings: {
+    title: typeof settings.title === 'string' ? settings.title : 'Crypto watchlist',
+    coins: coins || 'btc-bitcoin,eth-ethereum,sol-solana',
+    currency: MARKET_CURRENCIES.includes(settings.currency) ? settings.currency : 'USD',
+    refreshMinutes: interval >= 60 ? Math.min(interval, 1440) : 60,
+  } };
+}
+
 export function normalizePreferences(raw = {}) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Invalid preferences.');
   const settings = structuredClone(DEFAULT_SETTINGS);
@@ -69,9 +90,10 @@ export function validateCanvas(raw, registry) {
     }
     if (cell.w < known.minimumSize.w || cell.h < known.minimumSize.h) throw new Error('Widget is below its supported minimum size.');
     cell.minW = known.minimumSize.w; cell.minH = known.minimumSize.h;
-    const source = item.type === 'favourites' && !Object.hasOwn(item.settings || {}, 'shortcutStyle')
-      ? { ...item, settings: { ...item.settings, shortcutStyle: getShortcutStyle(raw.preferences || {}) } }
-      : item;
+    const migratedItem = migrateMarketWidget(item);
+    const source = migratedItem.type === 'favourites' && !Object.hasOwn(migratedItem.settings || {}, 'shortcutStyle')
+      ? { ...migratedItem, settings: { ...migratedItem.settings, shortcutStyle: getShortcutStyle(raw.preferences || {}) } }
+      : migratedItem;
     const validated = registry.validate(source);
     if (item.type === 'favourites' && !isStableId(validated.settings.collectionId)) throw new Error('Invalid shortcut collection reference.');
     return validated;

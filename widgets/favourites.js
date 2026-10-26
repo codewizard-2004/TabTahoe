@@ -20,6 +20,10 @@ export function mountFavourites(context, services) {
     root.classList.toggle('icons-only', style === 'icons-only');
     root.classList.toggle('glass-shortcuts', style === 'glass');
     root.classList.toggle('clear-glass-shortcuts', style === 'clear-glass');
+    const groupDialog = $('#group-dialog');
+    groupDialog.classList.toggle('icons-only', style === 'icons-only');
+    groupDialog.classList.toggle('glass-shortcuts', style === 'glass');
+    groupDialog.classList.toggle('clear-glass-shortcuts', style === 'clear-glass');
   }
   function saveState() {
     services.saveCollection(instance.settings.collectionId, apps).catch(() => toast('Shortcuts could not be saved. Your layout has not been changed.'));
@@ -162,7 +166,8 @@ for (const zone of [...$$('[data-trash]'), $('#move-to-root'), $('#app-grid'), $
 }
 
 function openGroup(id) {
-  activeGroup = id; groupPage = 0; $('#group-filter').value = ''; renderGroup(); showDialog('#group-dialog');
+  activeGroup = id; groupPage = 0; $('#group-filter').value = '';
+  renderGroup(); showDialog('#group-dialog');
 }
 function renderGroup() {
   const found = findApp(apps, activeGroup);

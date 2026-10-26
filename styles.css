@@ -284,18 +284,18 @@ dialog #toast{background:var(--glass-fill);border-color:var(--glass-border);box-
 
 
 /* Shortcut glass uses the same surface as dashboard panels and dialogs. */
-.glass-shortcuts .app-tile:not(.folder-tile){
+.glass-shortcuts .app-tile{
   background:var(--glass-fill);
   border-color:var(--glass-border);
   box-shadow:var(--glass-shadow);
   backdrop-filter:var(--glass-filter);
   -webkit-backdrop-filter:var(--glass-filter);
 }
-.glass-shortcuts .app-item:hover .app-tile:not(.folder-tile){
+.glass-shortcuts .app-item:hover .app-tile{
   border-color:#ffffff70;
   box-shadow:var(--glass-shadow),0 8px 20px #061a2220;
 }
-.glass-shortcuts .app-item.drop-target .app-tile:not(.folder-tile){
+.glass-shortcuts .app-item.drop-target .app-tile{
   box-shadow:var(--glass-shadow),0 0 24px #c3f9e340;
 }
 .glass-shortcuts .mini-tile{background:var(--glass-control-fill);box-shadow:var(--glass-control-highlight)}
